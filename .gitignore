@@ -3,6 +3,7 @@ build/
 out/
 out/coverage/*
 cmake-build-*/
+.*-build/
 conan-cache/
 
 # User spesific settings
