@@ -31,7 +31,9 @@ set_tests_properties(cli.version_matches PROPERTIES PASS_REGULAR_EXPRESSION "${P
 
 add_executable(aborts aborts.cpp abort_detection.cpp)
 add_test(NAME aborts_test COMMAND $<TARGET_FILE:aborts>)
-set_property(TEST aborts_test PROPERTY WILL_FAIL true)
+set_tests_properties(aborts_test PROPERTIES
+  PASS_REGULAR_EXPRESSION "##ABORTED##"
+)
 
 add_executable(tests tests.cpp)
 target_link_libraries(
