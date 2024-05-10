@@ -25,6 +25,14 @@ set_tests_properties(aborts_test PROPERTIES
   PASS_REGULAR_EXPRESSION "##ABORTED##"
 )
 
+add_executable(precondition_failure precondition_failure.cpp abort_detection.cpp)
+target_link_libraries(precondition_failure adobe-contract-checking)
+add_test(NAME precondition_failure_test COMMAND $<TARGET_FILE:precondition_failure>)
+set_tests_properties(precondition_failure_test PROPERTIES
+  PASS_REGULAR_EXPRESSION "##ABORTED##"
+)
+
+
 add_executable(tests tests.cpp)
 target_link_libraries(
   tests
