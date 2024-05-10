@@ -18,14 +18,19 @@ namespace adobe {
   };
 
   [[noreturn]] void contract_violated(contract_violation const& reason);
+
+  [[noreturn]] inline void default_contract_violated(contract_violation const& reason) {
+    try {
+      throw reason;
+    } catch(...) {
+      std::terminate();
+    }
+  }
 }
 
 #define ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER() \
-  [[noreturn]] void ::adobe::contract_violated(::adobe::contract_violation const& reason) { \
-  try { throw reason; } catch(...) { std::terminate(); } \
-  }
-
-
+  [[noreturn]] void ::adobe::contract_violated(::adobe::contract_violation const& reason) \
+  { ::adobe::default_contract_violated(reason); }
 
 #define ADOBE_PRECONDITION(condition) if(condition); else ::adobe::contract_violated(::adobe::contract_violation{"precondition"})
 
