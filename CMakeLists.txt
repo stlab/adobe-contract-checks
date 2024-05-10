@@ -16,11 +16,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set the project name and language
 project(
-  myproject
+  adobe-contract-checking
   VERSION 0.0.1
-  DESCRIPTION ""
+  DESCRIPTION "C++ contract checking from Adobe"
   HOMEPAGE_URL "%%myurl%%"
-  LANGUAGES CXX C)
+  LANGUAGES CXX)
 
 include(cmake/PreventInSourceBuilds.cmake)
 include(ProjectOptions.cmake)
