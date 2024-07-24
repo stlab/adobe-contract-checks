@@ -19,7 +19,7 @@ endif()
 
 include(${Catch2_SOURCE_DIR}/extras/Catch.cmake)
 
-# Adds a test called <base_name>_test, built from <base_name>.cpp with
+# Adds a test called verify_<base_name>, built from <base_name>.cpp with
 # test executable target named <base_name>, that fails unless it calls
 # abort() with a string matching the regular expression
 # <expected_output_re> embedded in the test's output.
@@ -27,14 +27,14 @@ function(adobe_contract_checking_add_abort_test base_name expected_output_re)
   add_executable(${base_name} ${base_name}.cpp abort_detection.cpp)
   adobe_contract_checking_apply_standard_options(${base_name})
   target_link_libraries(${base_name} PRIVATE adobe-contract-checking)
-  add_test(NAME ${base_name}_test COMMAND $<TARGET_FILE:${base_name}>)
-  set_tests_properties(${base_name}_test PROPERTIES
+  add_test(NAME verify_${base_name} COMMAND $<TARGET_FILE:${base_name}>)
+  set_tests_properties(verify_${base_name} PROPERTIES
     PASS_REGULAR_EXPRESSION "${expected_output_re}.*##ABORTED##"
   )
 endfunction()
 
-adobe_contract_checking_add_abort_test(aborts "")
-adobe_contract_checking_add_abort_test(precondition_failure "precondition")
+adobe_contract_checking_add_abort_test(abort_is_detected "")
+adobe_contract_checking_add_abort_test(precondition_failure_aborts "precondition")
 
 if(NO)
   add_executable(tests tests.cpp)
