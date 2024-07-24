@@ -36,37 +36,34 @@ endfunction()
 adobe_contract_checking_add_abort_test(abort_is_detected "")
 adobe_contract_checking_add_abort_test(precondition_failure_aborts "precondition")
 
-if(NO)
-  add_executable(tests tests.cpp)
-  target_link_libraries(
-    tests
-    PRIVATE adobe_contract_checking::adobe_contract_checking_warnings
-    adobe_contract_checking::adobe_contract_checking_options
-    adobe_contract_checking::sample_library
-    Catch2::Catch2WithMain)
-endif()
+add_executable(throwing_tests throwing_tests.cpp)
+adobe_contract_checking_apply_standard_options(throwing_tests)
+target_link_libraries(
+  throwing_tests
+  PRIVATE
+  # adobe_contract_checking::sample_library
+  adobe-contract-checking
+  Catch2::Catch2WithMain)
 
 if(WIN32 AND BUILD_SHARED_LIBS)
   add_custom_command(
-    TARGET tests
+    TARGET throwing_tests
     PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:tests> $<TARGET_FILE_DIR:tests>
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:throwing_tests> $<TARGET_FILE_DIR:throwing_tests>
     COMMAND_EXPAND_LISTS)
 endif()
 
-if(NO)
-  # automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
-  # to whatever you want, or use different for different binaries
-  catch_discover_tests(
-    tests
-    TEST_PREFIX
-    "unittests."
-    REPORTER
-    XML
-    OUTPUT_DIR
-    .
-    OUTPUT_PREFIX
-    "unittests."
-    OUTPUT_SUFFIX
-    .xml)
-endif()
+# automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
+# to whatever you want, or use different for different binaries
+catch_discover_tests(
+  throwing_tests
+  TEST_PREFIX
+  "unittests."
+  REPORTER
+  XML
+  OUTPUT_DIR
+  .
+  OUTPUT_PREFIX
+  "unittests."
+  OUTPUT_SUFFIX
+  .xml)
