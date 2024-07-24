@@ -7,9 +7,9 @@ project(CmakeConfigPackageTests LANGUAGES CXX)
 if(PROJECT_IS_TOP_LEVEL OR TEST_INSTALLED_VERSION)
   enable_testing()
 
-  find_package(myproject CONFIG REQUIRED) # for intro, project_options, ...
+  find_package(adobe_contract_checking CONFIG REQUIRED) # for intro, project_options, ...
 
-  if(NOT TARGET myproject_options)
+  if(NOT TARGET adobe_contract_checking_options)
     message(FATAL_ERROR "Required config package not found!")
     return() # be strictly paranoid for Template Janitor github action! CK
   endif()
@@ -25,7 +25,7 @@ include(${Catch2_SOURCE_DIR}/extras/Catch.cmake)
 # <expected_output_re> embedded in the test's output.
 function(add_abort_test base_name expected_output_re)
   add_executable(${base_name} ${base_name}.cpp abort_detection.cpp)
-  myproject_apply_standard_options(${base_name})
+  adobe_contract_checking_apply_standard_options(${base_name})
   target_link_libraries(${base_name} PRIVATE adobe-contract-checking)
   add_test(NAME ${base_name}_test COMMAND $<TARGET_FILE:${base_name}>)
   set_tests_properties(${base_name}_test PROPERTIES
@@ -40,9 +40,9 @@ if(NO)
   add_executable(tests tests.cpp)
   target_link_libraries(
     tests
-    PRIVATE myproject::myproject_warnings
-    myproject::myproject_options
-    myproject::sample_library
+    PRIVATE adobe_contract_checking::adobe_contract_checking_warnings
+    adobe_contract_checking::adobe_contract_checking_options
+    adobe_contract_checking::sample_library
     Catch2::Catch2WithMain)
 endif()
 

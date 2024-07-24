@@ -26,13 +26,13 @@ include(cmake/PreventInSourceBuilds.cmake)
 include(ProjectOptions.cmake)
 
 
-myproject_setup_options()
+adobe_contract_checking_setup_options()
 
-myproject_global_options()
+adobe_contract_checking_global_options()
 include(Dependencies.cmake)
-myproject_setup_dependencies()
+adobe_contract_checking_setup_dependencies()
 
-myproject_local_options()
+adobe_contract_checking_local_options()
 
 # don't know if this should be set globally from here or not...
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
@@ -46,13 +46,13 @@ string(
             8
             GIT_SHORT_SHA)
 
-target_compile_features(myproject_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
+target_compile_features(adobe_contract_checking_options INTERFACE cxx_std_${CMAKE_CXX_STANDARD})
 
-add_library(myproject::myproject_options ALIAS myproject_options)
-add_library(myproject::myproject_warnings ALIAS myproject_warnings)
+add_library(adobe_contract_checking::adobe_contract_checking_options ALIAS adobe_contract_checking_options)
+add_library(adobe_contract_checking::adobe_contract_checking_warnings ALIAS adobe_contract_checking_warnings)
 
-#add_library(myproject::myproject_options INTERFACE IMPORTED)
-#add_library(myproject::myproject_warnings INTERFACE IMPORTED)
+#add_library(adobe_contract_checking::adobe_contract_checking_options INTERFACE IMPORTED)
+#add_library(adobe_contract_checking::adobe_contract_checking_warnings INTERFACE IMPORTED)
 
 # configure files based on CMake configuration options
 add_subdirectory(configured_files)
@@ -131,10 +131,10 @@ include(cmake/PackageProject.cmake)
 
 # Add other targets that you want installed here, by default we just package the one executable
 # we know we want to ship
-myproject_package_project(
+adobe_contract_checking_package_project(
   TARGETS
-  myproject_options
-  myproject_warnings
+  adobe_contract_checking_options
+  adobe_contract_checking_warnings
   # FIXME: this does not work! CK
   # PRIVATE_DEPENDENCIES_CONFIGURED project_options project_warnings
 )

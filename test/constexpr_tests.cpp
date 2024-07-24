@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include <myproject/sample_library.hpp>
+#include <adobe_contract_checking/sample_library.hpp>
 
 TEST_CASE("Factorials are computed with constexpr", "[factorial]")
 {

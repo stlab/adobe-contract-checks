@@ -5,9 +5,9 @@ add_library(sample_library sample_library.cpp)
 
 
 
-add_library(myproject::sample_library ALIAS sample_library)
+add_library(adobe_contract_checking::sample_library ALIAS sample_library)
 
-target_link_libraries(sample_library PRIVATE myproject_options myproject_warnings)
+target_link_libraries(sample_library PRIVATE adobe_contract_checking_options adobe_contract_checking_warnings)
 
 target_include_directories(sample_library ${WARNING_GUARD} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
                                                                   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
