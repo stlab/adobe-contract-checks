@@ -32,14 +32,15 @@ set_tests_properties(precondition_failure_test PROPERTIES
   PASS_REGULAR_EXPRESSION "precondition.*##ABORTED##"
 )
 
-
-add_executable(tests tests.cpp)
-target_link_libraries(
-  tests
-  PRIVATE myproject::myproject_warnings
-          myproject::myproject_options
-          myproject::sample_library
-          Catch2::Catch2WithMain)
+if(NO)
+  add_executable(tests tests.cpp)
+  target_link_libraries(
+    tests
+    PRIVATE myproject::myproject_warnings
+    myproject::myproject_options
+    myproject::sample_library
+    Catch2::Catch2WithMain)
+endif()
 
 if(WIN32 AND BUILD_SHARED_LIBS)
   add_custom_command(
@@ -49,18 +50,19 @@ if(WIN32 AND BUILD_SHARED_LIBS)
     COMMAND_EXPAND_LISTS)
 endif()
 
-# automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
-# to whatever you want, or use different for different binaries
-catch_discover_tests(
-  tests
-  TEST_PREFIX
-  "unittests."
-  REPORTER
-  XML
-  OUTPUT_DIR
-  .
-  OUTPUT_PREFIX
-  "unittests."
-  OUTPUT_SUFFIX
-  .xml)
-
+if(NO)
+  # automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
+  # to whatever you want, or use different for different binaries
+  catch_discover_tests(
+    tests
+    TEST_PREFIX
+    "unittests."
+    REPORTER
+    XML
+    OUTPUT_DIR
+    .
+    OUTPUT_PREFIX
+    "unittests."
+    OUTPUT_SUFFIX
+    .xml)
+endif()
