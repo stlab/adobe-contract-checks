@@ -1,7 +1,7 @@
 ## Build Instructions
 
 ```
-cmake -Wno-dev -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -GNinja -S . -B .ninja-build
+cmake -Wno-dev -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -GNinja -S . -B .ninja-build && ln -sf .ninja-build/compile_commands.json .
 cmake --build .ninja-build && ctest --test-dir .ninja-build
 ```
 
