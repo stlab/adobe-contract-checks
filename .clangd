@@ -1,0 +1,41 @@
+---
+# This file is used by Emacs' flycheck; it should be kept in sync with
+# the .clang-tidy file.
+CompileFlags:
+  # Treat code as C++, use C++17 standard, enable more warnings.
+  Add: [-xc++, -std=c++17, -Wall, -Wno-missing-prototypes]
+  # Remove extra warnings specified in compile commands.
+  # Single value is also acceptable, same as "Remove: [-mabi]"
+  Remove: -mabi
+Diagnostics:
+  # Tweak Clang-Tidy checks.
+  ClangTidy:
+    Add:
+      '*'
+    Remove:
+      - 'modernize-use-trailing-return-type'
+      - 'abseil-*'
+      - 'altera-*'
+      - 'android-*'
+      - 'fuchsia-*'
+      - 'google-*'
+      - 'llvm*'
+      - 'modernize-use-trailing-return-type'
+      - 'zircon-*'
+      - 'readability-else-after-return'
+      - 'readability-static-accessed-through-instance'
+      - 'readability-avoid-const-params-in-decls'
+      - 'cppcoreguidelines-non-private-member-variables-in-classes'
+      - 'misc-non-private-member-variables-in-classes'
+
+      # Catch2 creates static functions
+      - 'misc-use-anonymous-namespace'
+      - cert-err58-cpp
+      - cppcoreguidelines-avoid-do-while
+    CheckOptions:
+      readability-identifier-naming.VariableCase: lower_case
+
+
+# Local Variables:
+# mode: yaml
+# End:
