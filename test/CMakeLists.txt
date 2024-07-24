@@ -23,7 +23,7 @@ include(${Catch2_SOURCE_DIR}/extras/Catch.cmake)
 # test executable target named <base_name>, that fails unless it calls
 # abort() with a string matching the regular expression
 # <expected_output_re> embedded in the test's output.
-function(add_abort_test base_name expected_output_re)
+function(adobe_contract_checking_add_abort_test base_name expected_output_re)
   add_executable(${base_name} ${base_name}.cpp abort_detection.cpp)
   adobe_contract_checking_apply_standard_options(${base_name})
   target_link_libraries(${base_name} PRIVATE adobe-contract-checking)
@@ -33,8 +33,8 @@ function(add_abort_test base_name expected_output_re)
   )
 endfunction()
 
-add_abort_test(aborts "")
-add_abort_test(precondition_failure "precondition")
+adobe_contract_checking_add_abort_test(aborts "")
+adobe_contract_checking_add_abort_test(precondition_failure "precondition")
 
 if(NO)
   add_executable(tests tests.cpp)
