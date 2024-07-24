@@ -1,5 +1,6 @@
 #ifndef ADOBE_CONTRACT_CHECKS_HPP
 #define ADOBE_CONTRACT_CHECKS_HPP
+#include <cstdint>
 #include <exception>
 #include <stdexcept>
 #include <system_error>
@@ -67,12 +68,28 @@ namespace adobe {
 class contract_violation final : public ::std::logic_error
 {
 private:
+  // The kind of violation.
   std::error_condition _condition;
 
+  // The file in which the violation occurred.
+  const char *_file = "";
+
+  // The line number on which the violation occurred.
+  std::uint32_t _line = 0;
+
 public:
-  explicit contract_violation(std::error_condition condition, const char *message)
-    : ::std::logic_error(message), _condition(condition)
+  explicit contract_violation(std::error_condition condition,
+    const char *file,
+    std::uint32_t line,
+    const char *message)
+    : ::std::logic_error(message), _condition(condition), _file(file), _line(line)
   {}
+
+  // Returns the file in which the violation occurred.
+  const char *file() const { return _file; }
+
+  // Returns the line number on which the violation occurred.
+  std::uint32_t line() const { return _line; }
 
   [[nodiscard]] const std::error_condition &condition() const noexcept { return _condition; }
 };
@@ -110,8 +127,8 @@ namespace detail {
     case contract_violation_kind::unconditional_fatal_error:
       return "Unconditional fatal error occurred";
     default:
-      contract_violated(
-        contract_violation{ contract_violation_kind::precondition, "unkown category kind" });
+      contract_violated(contract_violation{
+        contract_violation_kind::precondition, __FILE__, __LINE__, "unkown category kind" });
     }
   }
 
@@ -133,7 +150,7 @@ namespace detail {
     ;                                                       \
   else                                                      \
     ::adobe::contract_violated(::adobe::contract_violation{ \
-      ::adobe::contract_violation_kind::precondition, "precondition" })
+      ::adobe::contract_violation_kind::precondition, __FILE__, __LINE__, "precondition" })
 
 #define ADOBE_POSTCONDITION(condition)
 #define ADOBE_INVARIANT(condition)
