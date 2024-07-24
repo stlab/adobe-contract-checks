@@ -198,3 +198,11 @@ macro(myproject_local_options)
   endif()
 
 endmacro()
+
+# Applies the standard project options to <target>.
+function(myproject_apply_standard_options target)
+  target_link_libraries(
+    ${target}
+    PRIVATE myproject::myproject_warnings
+    myproject::myproject_options)
+endfunction()

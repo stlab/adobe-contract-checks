@@ -19,21 +19,13 @@ endif()
 
 include(${Catch2_SOURCE_DIR}/extras/Catch.cmake)
 
-# Applies the standard project options to <target>.
-function(apply_standard_options target)
-  target_link_libraries(
-    ${target}
-    PRIVATE myproject::myproject_warnings
-    myproject::myproject_options)
-endfunction()
-
 # Adds a test called <base_name>_test, built from <base_name>.cpp with
 # test executable target named <base_name>, that fails unless it calls
 # abort() with a string matching the regular expression
 # <expected_output_re> embedded in the test's output.
 function(add_abort_test base_name expected_output_re)
   add_executable(${base_name} ${base_name}.cpp abort_detection.cpp)
-  apply_standard_options(${base_name})
+  myproject_apply_standard_options(${base_name})
   target_link_libraries(${base_name} PRIVATE adobe-contract-checking)
   add_test(NAME ${base_name}_test COMMAND $<TARGET_FILE:${base_name}>)
   set_tests_properties(${base_name}_test PROPERTIES
