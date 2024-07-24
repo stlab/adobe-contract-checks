@@ -65,7 +65,7 @@ add_subdirectory(src)
 # adobe-contract-checking has no compiled components. As such, we
 # declare it as an `INTERFACE` library, which denotes a collection of
 # target propeties to be applied transitively to linking targets. In
-# our case, this ammounts to an include directory, compile flags,
+# our case, this amounts to an include directory, compile flags,
 # linking flags, and links to system libraries.
 #
 add_library( adobe-contract-checking INTERFACE )
@@ -74,7 +74,7 @@ add_library( adobe-contract-checking::adobe-contract-checking ALIAS adobe-contra
 #
 # The include directory for adobe-contract-checking can be expected to
 # vary between build and installaion. Here we use a CMake generator
-# expression to dispatch on how the configuration under which this
+# expression to dispatch on the configuration under which this
 # library is being consumed.
 #
 target_include_directories( adobe-contract-checking INTERFACE
