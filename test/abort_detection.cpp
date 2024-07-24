@@ -8,8 +8,11 @@
 
 // A signal handler that prints "##ABORTED##" to stderr and exits with
 // EXIT_FAILURE.
-extern "C" void error_test_handle_abort(int) {
-  std::fprintf(stderr, "##ABORTED##");
+//
+// The printed string is chosen to be unlikely to appear by accident
+// in other output.
+extern "C" void error_test_handle_abort(int /* unused signum */) {
+  (void)std::fprintf(stderr, "##ABORTED##"); // NOLINT(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
   std::_Exit(EXIT_FAILURE);
 }
 
@@ -19,7 +22,7 @@ struct test_override_abort {
   // As a side-effect, installs error_test_handle_abort as a SIGABRT
   // handler.
   test_override_abort() noexcept {
-    std::signal(SIGABRT, error_test_handle_abort);
+    (void)std::signal(SIGABRT, error_test_handle_abort);
   }
 };
 
