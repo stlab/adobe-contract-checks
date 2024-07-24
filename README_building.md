@@ -1,5 +1,7 @@
 ## Build Instructions
 
+cmake -Wno-dev -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -GNinja -S . -B .ninja-build && cmake --build .ninja-build
+
 A full build has different steps:
 1) Specifying the compiler using environment variables
 2) Configuring the project
