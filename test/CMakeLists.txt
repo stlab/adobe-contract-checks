@@ -34,7 +34,13 @@ function(adobe_contract_checking_add_abort_test base_name expected_output_re)
 endfunction()
 
 adobe_contract_checking_add_abort_test(abort_is_detected "")
-adobe_contract_checking_add_abort_test(precondition_failure_aborts "precondition")
+
+adobe_contract_checking_add_abort_test(
+  precondition_failure_aborts "precondition")
+
+adobe_contract_checking_add_abort_test(
+  precondition_failure_prints_file_and_line
+  "precondition_failure_prints_file_and_line.cpp:9999: Precondition violated:")
 
 add_executable(throwing_tests throwing_tests.cpp)
 adobe_contract_checking_apply_standard_options(throwing_tests)

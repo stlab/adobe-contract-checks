@@ -10,9 +10,10 @@ namespace adobe {
 // The predefined kinds of contract violations provided by this library.
 enum contract_violation_kind : int {
   precondition = 1,
+  // A precondition check, that is required to prevent undefined behavior, failed.
+  safety_precondition,
   postcondition,
   invariant,
-  safety_precondition,
   unconditional_fatal_error
 };
 
@@ -92,6 +93,11 @@ public:
   std::uint32_t line() const { return _line; }
 
   [[nodiscard]] const std::error_condition &condition() const noexcept { return _condition; }
+
+  void print_report() const
+  {
+    std::fprintf(stderr, "%s:%d: %s: %s\n", _file, _line, _condition.message().c_str(), what());
+  }
 };
 
 // The handler for contract violations, defined in the client's code.
@@ -106,6 +112,9 @@ public:
   // a default terminate handler.
   try {
     throw reason;
+  } catch (adobe::contract_violation const &e) {
+    e.print_report();
+    std::terminate();
   } catch (...) {
     std::terminate();
   }
@@ -117,15 +126,14 @@ namespace detail {
   {
     switch (kind) {
     case contract_violation_kind::precondition:
-      return "Precondition check violated";
-    case contract_violation_kind::postcondition:
-      return "Postcondition check violated";
-    case contract_violation_kind::invariant:
-      return "Invariant check violated";
     case contract_violation_kind::safety_precondition:
-      return "Precondition check required to ensure safety violated";
+      return "Precondition violated";
+    case contract_violation_kind::postcondition:
+      return "Postcondition violated";
+    case contract_violation_kind::invariant:
+      return "Invariant violated";
     case contract_violation_kind::unconditional_fatal_error:
-      return "Unconditional fatal error occurred";
+      return "Unconditional fatal error";
     default:
       contract_violated(contract_violation{
         contract_violation_kind::precondition, __FILE__, __LINE__, "unkown category kind" });
