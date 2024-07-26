@@ -42,6 +42,10 @@ adobe_contract_checking_add_abort_test(
   precondition_failure_prints_file_and_line
   "precondition_failure_prints_file_and_line.cpp:9999: Precondition violated:")
 
+adobe_contract_checking_add_abort_test(
+  precondition_failure_with_message_prints_file_line_and_message
+  "precondition_failure_with_message_prints_file_line_and_message.cpp:9999: Precondition violated: expected message")
+
 add_executable(throwing_tests throwing_tests.cpp)
 adobe_contract_checking_apply_standard_options(throwing_tests)
 target_link_libraries(

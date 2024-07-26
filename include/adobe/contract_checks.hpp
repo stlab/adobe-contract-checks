@@ -92,7 +92,7 @@ public:
   // Returns the line number on which the violation occurred.
   std::uint32_t line() const { return _line; }
 
-  [[nodiscard]] const std::error_condition &condition() const noexcept { return _condition; }
+  const std::error_condition &condition() const noexcept { return _condition; }
 
   void print_report() const
   {
@@ -153,12 +153,28 @@ namespace detail {
     ::adobe::default_contract_violated(reason);                                           \
   }
 
-#define ADOBE_PRECONDITION(condition)                       \
+// Optional macro arguments:
+// https://stackoverflow.com/questions/3046889/optional-parameters-with-c-macros
+
+#define ADOBE_PRECONDITION_X(arg0, arg1, invocation, ...) invocation
+
+#define ADOBE_PRECONDITION(...) \
+  ADOBE_PRECONDITION_X(         \
+    __VA_ARGS__, ADOBE_PRECONDITION_2(__VA_ARGS__), ADOBE_PRECONDITION_1(__VA_ARGS__))
+
+#define ADOBE_PRECONDITION_1(condition)                     \
   if (condition)                                            \
     ;                                                       \
   else                                                      \
     ::adobe::contract_violated(::adobe::contract_violation{ \
       ::adobe::contract_violation_kind::precondition, __FILE__, __LINE__, "precondition" })
+
+#define ADOBE_PRECONDITION_2(condition, message)            \
+  if (condition)                                            \
+    ;                                                       \
+  else                                                      \
+    ::adobe::contract_violated(::adobe::contract_violation{ \
+      ::adobe::contract_violation_kind::precondition, __FILE__, __LINE__, message })
 
 #define ADOBE_POSTCONDITION(condition)
 #define ADOBE_INVARIANT(condition)
