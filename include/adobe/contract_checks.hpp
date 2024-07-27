@@ -150,6 +150,12 @@ namespace detail {
 // TODO: Supply a default terminate handler that calls
 // get_current_exception and reports info.
 
+#if __has_cpp_attribute(unlikely)
+#define ADOBE_CONTRACT_VIOLATION_LIKELIHOOD [[unlikely]]
+#else
+#define ADOBE_CONTRACT_VIOLATION_LIKELIHOOD
+#endif
+
 #define ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()                                         \
   [[noreturn]] void ::adobe::contract_violated(::adobe::contract_violation_kind condition, \
     const char *file,                                                                      \
@@ -173,15 +179,19 @@ namespace detail {
   if (condition)                        \
     ;                                   \
   else                                  \
-    ::adobe::contract_violated(         \
-      ::adobe::contract_violation_kind::precondition, __FILE__, __LINE__, "precondition")
+    ADOBE_CONTRACT_VIOLATION_LIKELIHOOD \
+                                        \
+  ::adobe::contract_violated(           \
+    ::adobe::contract_violation_kind::precondition, __FILE__, __LINE__, "precondition")
 
 #define ADOBE_PRECONDITION_2(condition, message) \
   if (condition)                                 \
     ;                                            \
   else                                           \
-    ::adobe::contract_violated(                  \
-      ::adobe::contract_violation_kind::precondition, __FILE__, __LINE__, message)
+    ADOBE_CONTRACT_VIOLATION_LIKELIHOOD          \
+                                                 \
+  ::adobe::contract_violated(                    \
+    ::adobe::contract_violation_kind::precondition, __FILE__, __LINE__, message)
 
 #define ADOBE_POSTCONDITION(condition)
 #define ADOBE_INVARIANT(condition)
