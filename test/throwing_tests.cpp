@@ -3,10 +3,14 @@
 #include <catch2/matchers/catch_matchers.hpp>
 #include <cstdint>
 #include <string_view>
+#include <system_error>
 
-[[noreturn]] void ::adobe::contract_violated(::adobe::contract_violation const &reason)
+[[noreturn]] void ::adobe::contract_violated(std::error_condition condition,
+  const char *file,
+  std::uint32_t line,
+  const char *message)
 {
-  throw reason;
+  throw ::adobe::contract_violation(condition, file, line, message);
 }
 
 TEST_CASE("Precondition violation encodes file and line", "[file-and-line-encoded]")

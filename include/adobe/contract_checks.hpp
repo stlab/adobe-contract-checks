@@ -103,7 +103,10 @@ public:
 // The handler for contract violations, defined in the client's code.
 //
 // A default handler can be injected using ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER().
-[[noreturn]] void contract_violated(contract_violation const &reason);
+[[noreturn]] void contract_violated(std::error_condition condition,
+  const char *file,
+  std::uint32_t line,
+  const char *message);
 
 [[noreturn]] inline void default_contract_violated(contract_violation const &reason)
 {
@@ -135,8 +138,8 @@ namespace detail {
     case contract_violation_kind::unconditional_fatal_error:
       return "Unconditional fatal error";
     default:
-      contract_violated(contract_violation{
-        contract_violation_kind::precondition, __FILE__, __LINE__, "unkown category kind" });
+      contract_violated(
+        contract_violation_kind::precondition, __FILE__, __LINE__, "unkown category kind");
     }
   }
 
@@ -147,10 +150,12 @@ namespace detail {
 // TODO: Supply a default terminate handler that calls
 // get_current_exception and reports info.
 
-#define ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()                                        \
-  [[noreturn]] void ::adobe::contract_violated(::adobe::contract_violation const &reason) \
-  {                                                                                       \
-    ::adobe::default_contract_violated(reason);                                           \
+#define ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()                                             \
+  [[noreturn]] void ::adobe::contract_violated(                                                \
+    std::error_condition condition, const char *file, std::uint32_t line, const char *message) \
+  {                                                                                            \
+    ::adobe::default_contract_violated(                                                        \
+      ::adobe::contract_violation(condition, file, line, message));                            \
   }
 
 // Optional macro arguments:
@@ -162,19 +167,19 @@ namespace detail {
   ADOBE_PRECONDITION_X(         \
     __VA_ARGS__, ADOBE_PRECONDITION_2(__VA_ARGS__), ADOBE_PRECONDITION_1(__VA_ARGS__))
 
-#define ADOBE_PRECONDITION_1(condition)                     \
-  if (condition)                                            \
-    ;                                                       \
-  else                                                      \
-    ::adobe::contract_violated(::adobe::contract_violation{ \
-      ::adobe::contract_violation_kind::precondition, __FILE__, __LINE__, "precondition" })
+#define ADOBE_PRECONDITION_1(condition) \
+  if (condition)                        \
+    ;                                   \
+  else                                  \
+    ::adobe::contract_violated(         \
+      ::adobe::contract_violation_kind::precondition, __FILE__, __LINE__, "precondition")
 
-#define ADOBE_PRECONDITION_2(condition, message)            \
-  if (condition)                                            \
-    ;                                                       \
-  else                                                      \
-    ::adobe::contract_violated(::adobe::contract_violation{ \
-      ::adobe::contract_violation_kind::precondition, __FILE__, __LINE__, message })
+#define ADOBE_PRECONDITION_2(condition, message) \
+  if (condition)                                 \
+    ;                                            \
+  else                                           \
+    ::adobe::contract_violated(                  \
+      ::adobe::contract_violation_kind::precondition, __FILE__, __LINE__, message)
 
 #define ADOBE_POSTCONDITION(condition)
 #define ADOBE_INVARIANT(condition)
