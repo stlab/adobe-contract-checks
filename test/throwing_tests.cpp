@@ -5,7 +5,7 @@
 #include <string_view>
 #include <system_error>
 
-[[noreturn]] void ::adobe::contract_violated(std::error_condition condition,
+[[noreturn]] void ::adobe::contract_violated(::adobe::contract_violation_kind condition,
   const char *file,
   std::uint32_t line,
   const char *message)

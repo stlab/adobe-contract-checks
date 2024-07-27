@@ -103,7 +103,7 @@ public:
 // The handler for contract violations, defined in the client's code.
 //
 // A default handler can be injected using ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER().
-[[noreturn]] void contract_violated(std::error_condition condition,
+[[noreturn]] void contract_violated(contract_violation_kind condition,
   const char *file,
   std::uint32_t line,
   const char *message);
@@ -150,12 +150,14 @@ namespace detail {
 // TODO: Supply a default terminate handler that calls
 // get_current_exception and reports info.
 
-#define ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()                                             \
-  [[noreturn]] void ::adobe::contract_violated(                                                \
-    std::error_condition condition, const char *file, std::uint32_t line, const char *message) \
-  {                                                                                            \
-    ::adobe::default_contract_violated(                                                        \
-      ::adobe::contract_violation(condition, file, line, message));                            \
+#define ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()                                         \
+  [[noreturn]] void ::adobe::contract_violated(::adobe::contract_violation_kind condition, \
+    const char *file,                                                                      \
+    std::uint32_t line,                                                                    \
+    const char *message)                                                                   \
+  {                                                                                        \
+    ::adobe::default_contract_violated(                                                    \
+      ::adobe::contract_violation(condition, file, line, message));                        \
   }
 
 // Optional macro arguments:
