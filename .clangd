@@ -7,19 +7,6 @@ CompileFlags:
   # Remove extra warnings specified in compile commands.
   # Single value is also acceptable, same as "Remove: [-mabi]"
   Remove: -mabi
-Diagnostics:
-  # Tweak Clang-Tidy checks.
-  ClangTidy:
-    # Remove:
-    #   # Catch2 creates static functions
-    #   - 'misc-use-anonymous-namespace'
-    #   - cert-err58-cpp
-    #   - cppcoreguidelines-avoid-do-while
-    #   # - readability-function-cognitive-complexity
-    #   - readability-identifier-length
-    # CheckOptions:
-    #   readability-identifier-naming.VariableCase: lower_case
-
 
 # Local Variables:
 # mode: yaml
