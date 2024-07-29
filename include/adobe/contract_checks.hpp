@@ -191,7 +191,7 @@ namespace detail {
 // <message> if supplied) when <condition> is false.
 #define ADOBE_PRECONDITION(...) \
   ADOBE_THIRD_ARGUMENT(         \
-    __VA_ARGS__, ADOBE_PRECONDITION_2(__VA_ARGS__), ADOBE_PRECONDITION_1(__VA_ARGS__))
+    __VA_ARGS__, ADOBE_PRECONDITION_2(__VA_ARGS__), ADOBE_PRECONDITION_1(__VA_ARGS__), ignored)
 
 // Expands to a statement that reports a precondition failure when
 // condition is false.
