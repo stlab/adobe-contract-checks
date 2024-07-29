@@ -108,17 +108,18 @@ public:
   std::uint32_t line,
   const char *message);
 
-[[noreturn]] inline void default_contract_violated(contract_violation const &reason)
+[[noreturn]] inline void default_contract_violated(contract_violation_kind condition,
+  const char *file,
+  std::uint32_t line,
+  const char *message)
 {
   // This pattern, calling terminate while unwinding, causes most
   // standard libraries to report the exception that was thrown via
   // a default terminate handler.
   try {
-    throw reason;
-  } catch (adobe::contract_violation const &e) {
+    throw contract_violation(condition, file, line, message);
+  } catch (contract_violation const &e) {
     e.print_report();
-    std::terminate();
-  } catch (...) {
     std::terminate();
   }
 }
@@ -168,8 +169,7 @@ namespace detail {
     std::uint32_t line,                                                                    \
     const char *message)                                                                   \
   {                                                                                        \
-    ::adobe::default_contract_violated(                                                    \
-      ::adobe::contract_violation(condition, file, line, message));                        \
+    ::adobe::default_contract_violated(condition, file, line, message);                    \
   }
 
 // Contract checking macros take a condition and an optional second argument.
