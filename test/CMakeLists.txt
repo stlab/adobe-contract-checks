@@ -63,12 +63,14 @@ if(WIN32 AND BUILD_SHARED_LIBS)
     COMMAND_EXPAND_LISTS)
 endif()
 
-# automatically discover tests that are defined in catch based test files you can modify the unittests. Set TEST_PREFIX
-# to whatever you want, or use different for different binaries
+# automatically discover tests that are defined in catch based test files you can modify the
+# unittests. Set TEST_PREFIX to whatever you want, or use different for different binaries
 catch_discover_tests(
   throwing_tests
-  TEST_PREFIX
-  "unittests."
+  # setting TEST_PREFIX seems to be incompatible with VSCode integrations.
+
+  # TEST_PREFIX
+  # "unittests."
   REPORTER
   XML
   OUTPUT_DIR
