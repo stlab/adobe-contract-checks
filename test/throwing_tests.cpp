@@ -28,5 +28,5 @@ TEST_CASE("Precondition violation encodes file and line", "[file-and-line-encode
 TEST_CASE("Throwing violation handler works", "[throwing]")
 {
   CHECK_THROWS_AS([] { ADOBE_PRECONDITION(false); }(), adobe::contract_violation);
-  CHECK_THROWS_WITH([] { ADOBE_PRECONDITION(false); }(), "precondition");
+  CHECK_THROWS_WITH([] { ADOBE_PRECONDITION(false, "expected message"); }(), "expected message");
 }

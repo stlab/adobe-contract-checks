@@ -151,11 +151,17 @@ namespace detail {
 // get_current_exception and reports info.
 
 #if __has_cpp_attribute(unlikely)
+// The attribute (if any) that marks the cold path in a contract check.
 #define ADOBE_CONTRACT_VIOLATION_LIKELIHOOD [[unlikely]]
 #else
+// The attribute (if any) that marks the cold path in a contract check.
 #define ADOBE_CONTRACT_VIOLATION_LIKELIHOOD
 #endif
 
+// Injects a definition of ::adobe::contract_violated that reports
+// violations to stdout and invokes std::terminate.
+//
+// See ::adobe::default_contract_violated for details.
 #define ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()                                         \
   [[noreturn]] void ::adobe::contract_violated(::adobe::contract_violation_kind condition, \
     const char *file,                                                                      \
@@ -166,15 +172,29 @@ namespace detail {
       ::adobe::contract_violation(condition, file, line, message));                        \
   }
 
-// Optional macro arguments:
-// https://stackoverflow.com/questions/3046889/optional-parameters-with-c-macros
+// Contract checking macros take a condition and an optional second argument.
+//
+// Information on how to simulate optional arguments is here:
+// https://stackoverflow.com/questions/3046889/optional-parameters-with-c-macros.
+//
+// The user experience when zero or three arguments are passed could
+// be improved; portably detecting empty macro arguments could be used
+// to help.
 
-#define ADOBE_PRECONDITION_X(arg0, arg1, invocation, ...) invocation
+// Expands to its third argument
+#define ADOBE_THIRD_ARGUMENT(arg0, arg1, invocation, ...) invocation
 
+// ADOBE_PRECONDITION(<condition>);
+// ADOBE_PRECONDITION(<condition>, <message: const char*>);
+//
+// Expands to a statement that reports a precondition failure (and
+// <message> if supplied) when <condition> is false.
 #define ADOBE_PRECONDITION(...) \
-  ADOBE_PRECONDITION_X(         \
+  ADOBE_THIRD_ARGUMENT(         \
     __VA_ARGS__, ADOBE_PRECONDITION_2(__VA_ARGS__), ADOBE_PRECONDITION_1(__VA_ARGS__))
 
+// Expands to a statement that reports a precondition failure when
+// condition is false.
 #define ADOBE_PRECONDITION_1(condition) \
   if (condition)                        \
     ;                                   \
@@ -182,8 +202,10 @@ namespace detail {
     ADOBE_CONTRACT_VIOLATION_LIKELIHOOD \
                                         \
   ::adobe::contract_violated(           \
-    ::adobe::contract_violation_kind::precondition, __FILE__, __LINE__, "precondition")
+    ::adobe::contract_violation_kind::precondition, __FILE__, __LINE__, "")
 
+// Expands to a statement that reports a precondition failure and
+// <message: const char*> when condition is false.
 #define ADOBE_PRECONDITION_2(condition, message) \
   if (condition)                                 \
     ;                                            \
