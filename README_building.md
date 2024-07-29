@@ -1,8 +1,8 @@
 ## Build Instructions
 
 ```
-cmake -Wno-dev -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -GNinja -S . -B .ninja-build && ln -sf .ninja-build/compile_commands.json .
-cmake --build .ninja-build && ctest --test-dir .ninja-build
+cmake --preset unixlike-clang-debug -Wno-dev -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -GNinja -S . -B .ninja-build && ln -sf .ninja-build/compile_commands.json .
+cmake --build .ninja-build && ctest  --preset test-unixlike-clang-debug --test-dir .ninja-build
 ```
 
 A full build has different steps:
