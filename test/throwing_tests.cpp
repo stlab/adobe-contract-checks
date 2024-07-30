@@ -4,15 +4,16 @@
 #include <cstdint>
 #include <string_view>
 
-[[noreturn]] void ::adobe::contract_violated(::adobe::contract_violation::kind_t kind,
+[[noreturn]] void ::adobe::contract_violated(const char *const condition,
+  ::adobe::contract_violation::kind_t kind,
   const char *file,
   std::uint32_t line,
   const char *message)
 {
-  throw ::adobe::contract_violation(kind, file, line, message);
+  throw contract_violation(condition, kind, file, line, message);
 }
 
-TEST_CASE("Precondition violation encodes file and line", "[file-and-line-encoded]")
+TEST_CASE("Precondition encodes expected info", "[expected-info-encoded]")
 {
   std::uint32_t expected_line = 0;
   try {
@@ -21,6 +22,7 @@ TEST_CASE("Precondition violation encodes file and line", "[file-and-line-encode
   } catch (const adobe::contract_violation &v) {
     CHECK((v.line() == expected_line));
     CHECK((std::string_view(v.file()) == __FILE__));
+    CHECK((std::string_view(v.condition()) == "false"));
   }
 }
 

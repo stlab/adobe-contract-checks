@@ -94,15 +94,6 @@ if(NOT PROJECT_IS_TOP_LEVEL)
 endif()
 
 #
-# The include directory for stlab can be expected to vary between build
-# and installaion. Here we use a CMake generator expression to dispatch
-# on how the configuration under which this library is being consumed.
-#
-target_include_directories( adobe-contract-checking INTERFACE
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
-  $<INSTALL_INTERFACE:include> )
-
 # Adding the tests:
 include(CTest)
 
