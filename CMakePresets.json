@@ -189,63 +189,62 @@
                 "outputOnFailure": true
             },
             "execution": {
-                "noTestsAction": "error",
-                "stopOnFailure": true
+                "noTestsAction": "error"
             }
         },
         {
             "name": "test-windows-msvc-debug-developer-mode",
             "displayName": "Strict",
-            "description": "Enable output and stop on failure",
+            "description": "Enable output",
             "inherits": "test-common",
             "configurePreset": "windows-msvc-debug-developer-mode"
         },
         {
             "name": "test-windows-msvc-release-developer-mode",
             "displayName": "Strict",
-            "description": "Enable output and stop on failure",
+            "description": "Enable output",
             "inherits": "test-common",
             "configurePreset": "windows-msvc-release-developer-mode"
         },
         {
             "name": "test-windows-clang-debug",
             "displayName": "Strict",
-            "description": "Enable output and stop on failure",
+            "description": "Enable output",
             "inherits": "test-common",
             "configurePreset": "windows-clang-debug"
         },
         {
             "name": "test-windows-clang-release",
             "displayName": "Strict",
-            "description": "Enable output and stop on failure",
+            "description": "Enable output",
             "inherits": "test-common",
             "configurePreset": "windows-clang-release"
         },
         {
             "name": "test-unixlike-gcc-debug",
             "displayName": "Strict",
-            "description": "Enable output and stop on failure",
+            "description": "Enable output",
             "inherits": "test-common",
             "configurePreset": "unixlike-gcc-debug"
         },
         {
             "name": "test-unixlike-gcc-release",
             "displayName": "Strict",
-            "description": "Enable output and stop on failure",
+            "description": "Enable output",
             "inherits": "test-common",
             "configurePreset": "unixlike-gcc-release"
         },
         {
             "name": "test-unixlike-clang-debug",
             "displayName": "Strict",
-            "description": "Enable output and stop on failure",
+            "description": "Enable output",
             "inherits": "test-common",
             "configurePreset": "unixlike-clang-debug"
         },
         {
             "name": "test-unixlike-clang-release",
             "displayName": "Strict",
-            "description": "Enable output and stop on failure",
+            "description": "Enable output",
             "inherits": "test-common",
             "configurePreset": "unixlike-clang-release"
         }
