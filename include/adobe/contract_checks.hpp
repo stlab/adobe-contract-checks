@@ -127,6 +127,31 @@ public:
     ::adobe::default_contract_violated(condition, kind, file, line, message); \
   }
 
+#include <cstdlib>
+
+#if defined(__GNUC__) && __GNUC__ < 10
+#  define INTERNAL_ADOBE_BUILTIN_TRAP __builtin_trap
+#elif defined(_MSC_VER)
+#  define INTERNAL_ADOBE_BUILTIN_TRAP __debugbreak
+#elif defined(__has_builtin) && __has_builtin(__builtin_trap)
+#  define INTERNAL_ADOBE_BUILTIN_TRAP __builtin_trap
+#else
+#  define INTERNAL_ADOBE_BUILTIN_TRAP std::abort
+#endif
+
+// Injects a definition of ::adobe::contract_violated that stops the
+// program in the most efficient known way, without any diagnostic
+// output.
+#define ADOBE_MINIMAL_CONTRACT_VIOLATION_HANDLER()                \
+  [[noreturn]] void ::adobe::contract_violated(const char *const, \
+    ::adobe::contract_violation::kind_t,                          \
+    const char *const,                                            \
+    std::uint32_t const,                                          \
+    const char *const)                                            \
+  {                                                               \
+    INTERNAL_ADOBE_BUILTIN_TRAP();                                \
+  }
+
 // Contract checking macros take a condition and an optional second argument.
 //
 // Information on how to simulate optional arguments is here:

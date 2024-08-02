@@ -19,10 +19,10 @@ endif()
 
 include(${Catch2_SOURCE_DIR}/extras/Catch.cmake)
 
-# Adds a test called verify_<base_name>, built from <base_name>.cpp with
-# test executable target named <base_name>, that fails unless it calls
-# abort() with a string matching the regular expression
-# <expected_output_re> embedded in the test's output.
+# Adds a test called verify_<base_name>, built from <base_name>.cpp
+# with test executable target named <base_name>, that passes iff it
+# calls abort() and outputs a string matching the regular expression
+# <expected_output_re>.
 function(adobe_contract_checking_add_abort_test base_name expected_output_re)
   add_executable(${base_name} ${base_name}.cpp abort_detection.cpp)
   adobe_contract_checking_apply_standard_options(${base_name})
@@ -30,6 +30,24 @@ function(adobe_contract_checking_add_abort_test base_name expected_output_re)
   add_test(NAME verify_${base_name} COMMAND $<TARGET_FILE:${base_name}>)
   set_tests_properties(verify_${base_name} PROPERTIES
     PASS_REGULAR_EXPRESSION "${expected_output_re}.*##ABORTED##"
+  )
+endfunction()
+
+# Adds a test called verify_<base_name>, built from <base_name>.cpp
+# with test executable target named <base_name>, that passes iff it
+# exits with an error and does not output a string matching regular
+# expression <unexpected_output_re>.
+function(adobe_contract_checking_add_minimal_failure_test base_name unexpected_output_re)
+  add_executable(${base_name} ${base_name}.cpp)
+  adobe_contract_checking_apply_standard_options(${base_name})
+  target_link_libraries(${base_name} PRIVATE adobe-contract-checking)
+  # we pass through the cmake command because typical break behaviors
+  # include raising SIGILL, which will cause CMake to report the test
+  # as a failure despite the WILL_FAIL setting.
+  add_test(NAME verify_${base_name} COMMAND ${CMAKE_COMMAND} -E env $<TARGET_FILE:${base_name}>)
+  set_tests_properties(verify_${base_name} PROPERTIES
+    WILL_FAIL YES
+    PASS_REGULAR_EXPRESSION "${unexpected_output_re}"
   )
 endfunction()
 
@@ -41,6 +59,9 @@ adobe_contract_checking_add_abort_test(
 adobe_contract_checking_add_abort_test(
   precondition_failure_output
   "precondition_failure_output.cpp:9999: Precondition violated [(]1 < 0[)]")
+
+adobe_contract_checking_add_minimal_failure_test(
+  precondition_failure_minimal "[(]1 < [0]")
 
 adobe_contract_checking_add_abort_test(
   precondition_failure_with_message_output
