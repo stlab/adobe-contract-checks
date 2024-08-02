@@ -129,14 +129,12 @@ public:
 
 #include <cstdlib>
 
-#if defined(__GNUC__) && __GNUC__ < 10
-#  define INTERNAL_ADOBE_BUILTIN_TRAP __builtin_trap
+#if defined(__clang__) || defined(__GNUC__) && __GNUC__ < 10
+#define INTERNAL_ADOBE_BUILTIN_TRAP() __builtin_trap()
 #elif defined(_MSC_VER)
-#  define INTERNAL_ADOBE_BUILTIN_TRAP __debugbreak
-#elif defined(__has_builtin) && __has_builtin(__builtin_trap)
-#  define INTERNAL_ADOBE_BUILTIN_TRAP __builtin_trap
+#define INTERNAL_ADOBE_BUILTIN_TRAP() __debugbreak()
 #else
-#  define INTERNAL_ADOBE_BUILTIN_TRAP std::abort
+#define INTERNAL_ADOBE_BUILTIN_TRAP() std::abort()
 #endif
 
 // Injects a definition of ::adobe::contract_violated that stops the
