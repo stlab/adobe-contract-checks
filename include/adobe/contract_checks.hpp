@@ -60,7 +60,12 @@ public:
   void print_report() const
   {
     if (_kind == predefined_kind::unconditional_fatal_error) {
-      std::fprintf(stderr, "%s:%d: %s: %s\n", _file, _line, "Unconditional fatal error", what());
+      std::fprintf(stderr,
+        "%s:%d: %s: %s\n",
+        _file,
+        static_cast<int>(_line),
+        "Unconditional fatal error",
+        what());
     } else {
       const char *const description =
         _kind == predefined_kind::precondition || _kind == predefined_kind::safety_precondition
@@ -68,7 +73,13 @@ public:
         : _kind == predefined_kind::postcondition ? "Postcondition not upheld"
         : _kind == predefined_kind::invariant     ? "Invariant violated"
                                                   : "Unknown category kind";
-      std::fprintf(stderr, "%s:%d: %s (%s). %s\n", _file, _line, description, _condition, what());
+      std::fprintf(stderr,
+        "%s:%d: %s (%s). %s\n",
+        _file,
+        static_cast<int>(_line),
+        description,
+        _condition,
+        what());
     }
   }
 };
