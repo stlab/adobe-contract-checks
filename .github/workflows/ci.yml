@@ -30,7 +30,7 @@ jobs:
       matrix:
         os:
           - ubuntu-20.04
-          - macos-latest
+          - macos-13
           - windows-2019
         compiler:
           # you can specify the version after `-` like "llvm-15.0.2".
