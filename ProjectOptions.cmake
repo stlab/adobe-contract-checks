@@ -11,7 +11,7 @@ macro(adobe_contract_checking_supports_sanitizers)
     set(SUPPORTS_UBSAN OFF)
   endif()
 
-  if((CMAKE_CXX_COMPILER_ID MATCHES ".*Clang.*" OR CMAKE_CXX_COMPILER_ID MATCHES ".*GNU.*") AND WIN32)
+  if(((CMAKE_CXX_COMPILER_ID MATCHES ".*Clang.*" OR CMAKE_CXX_COMPILER_ID MATCHES ".*GNU.*") AND WIN32) OR (CMAKE_CXX_COMPILER_ID MATCHES ".*GNU.*" AND APPLE))
     set(SUPPORTS_ASAN OFF)
   else()
     set(SUPPORTS_ASAN ON)
