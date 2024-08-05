@@ -11,6 +11,7 @@
             "description": "General settings that apply to all configurations",
             "hidden": true,
             "generator": "Ninja",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
             "installDir": "${sourceDir}/out/install/${presetName}"
         },
         {
