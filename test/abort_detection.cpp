@@ -6,7 +6,8 @@
 #include <cstdio>
 #include <cstdlib>
 
-// A signal handler that prints "##ABORTED##" to stderr and exists with EXIT_SUCCESS.
+// A signal handler that prints "##ABORTED##" to stderr and exits with
+// EXIT_FAILURE.
 //
 // The printed string is chosen to be unlikely to appear by accident
 // in other output.
@@ -14,10 +15,7 @@ extern "C" void error_test_handle_abort(int /* unused signum */)
 {
   (void)std::fprintf(
     stderr, "##ABORTED##");// NOLINT(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
-  std::fflush(stderr);
-
-  // EXIT_SUCCESS is used because EXIT_FAILURE may trigger a SIGABRT and loop.
-  std::_Exit(EXIT_SUCCESS);
+  std::_Exit(EXIT_FAILURE);
 }
 
 // Abort handler installer.
