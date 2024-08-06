@@ -19,7 +19,7 @@ project(
   adobe-contract-checking
   VERSION 0.0.1
   DESCRIPTION "C++ contract checking from Adobe"
-  HOMEPAGE_URL "%%myurl%%"
+  HOMEPAGE_URL "https://github.com/stlab/adobe-contract-checks"
   LANGUAGES CXX)
 
 include(cmake/PreventInSourceBuilds.cmake)
