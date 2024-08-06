@@ -82,7 +82,7 @@ public:
         what());
     }
     // Ensure the message is printed before the program terminates.
-    fflush(stderr);
+    (void)fflush(stderr);
   }
 };
 

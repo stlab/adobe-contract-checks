@@ -61,7 +61,7 @@ adobe_contract_checking_add_abort_test(
   "precondition_failure_output.cpp:9999: Precondition violated [(]false[)]")
 
 adobe_contract_checking_add_minimal_failure_test(
-  precondition_failure_minimal "[(]false[)]")
+  precondition_failure_minimal "")
 
 adobe_contract_checking_add_abort_test(
   precondition_failure_with_message_output

@@ -15,6 +15,7 @@ extern "C" void error_test_handle_abort(int /* unused signum */)
 {
   (void)std::fprintf(
     stderr, "##ABORTED##");// NOLINT(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
+  (void)std::fflush(stderr);
   std::_Exit(EXIT_FAILURE);
 }
 
