@@ -17,7 +17,7 @@ endif()
 
 # ---- Dependencies ----
 
-include(${Catch2_SOURCE_DIR}/extras/Catch.cmake)
+# include(${Catch2_SOURCE_DIR}/extras/Catch.cmake)
 
 # Adds a test called verify_<base_name>, built from <base_name>.cpp
 # with test executable target named <base_name>, that passes iff it
@@ -72,30 +72,10 @@ adobe_contract_checking_apply_standard_options(throwing_tests)
 target_link_libraries(
   throwing_tests
   PRIVATE
-  adobe-contract-checking
-  Catch2::Catch2WithMain)
+  adobe-contract-checking)
 
-if(WIN32 AND BUILD_SHARED_LIBS)
-  add_custom_command(
-    TARGET throwing_tests
-    PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:throwing_tests> $<TARGET_FILE_DIR:throwing_tests>
-    COMMAND_EXPAND_LISTS)
-endif()
-
-# automatically discover tests that are defined in catch based test files you can modify the
-# unittests. Set TEST_PREFIX to whatever you want, or use different for different binaries
-catch_discover_tests(
-  throwing_tests
-  # setting TEST_PREFIX seems to be incompatible with VSCode integrations.
-
-  # TEST_PREFIX
-  # "unittests."
-  REPORTER
-  XML
-  OUTPUT_DIR
-  .
-  OUTPUT_PREFIX
-  "unittests."
-  OUTPUT_SUFFIX
-  .xml)
+  add_test(NAME verify_throwing_tests COMMAND ${CMAKE_COMMAND} -E env $<TARGET_FILE:throwing_tests>)
+  set_tests_properties(verify_throwing_tests PROPERTIES
+    WILL_FAIL NO
+    PASS_REGULAR_EXPRESSION "All tests passed."
+  )

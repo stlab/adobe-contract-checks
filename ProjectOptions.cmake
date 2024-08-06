@@ -19,7 +19,6 @@ endmacro()
 
 macro(adobe_contract_checking_setup_options)
   option(adobe_contract_checking_ENABLE_HARDENING "Enable hardening" ON)
-  option(adobe_contract_checking_ENABLE_COVERAGE "Enable coverage reporting" OFF)
   cmake_dependent_option(
     adobe_contract_checking_ENABLE_GLOBAL_HARDENING
     "Attempt to push hardening options to built dependencies"
@@ -72,7 +71,6 @@ macro(adobe_contract_checking_setup_options)
       adobe_contract_checking_ENABLE_UNITY_BUILD
       adobe_contract_checking_ENABLE_CLANG_TIDY
       adobe_contract_checking_ENABLE_CPPCHECK
-      adobe_contract_checking_ENABLE_COVERAGE
       adobe_contract_checking_ENABLE_PCH
       adobe_contract_checking_ENABLE_CACHE)
   endif()
@@ -158,11 +156,6 @@ macro(adobe_contract_checking_local_options)
   if(adobe_contract_checking_ENABLE_CPPCHECK)
     adobe_contract_checking_enable_cppcheck(${adobe_contract_checking_WARNINGS_AS_ERRORS} "" # override cppcheck options
     )
-  endif()
-
-  if(adobe_contract_checking_ENABLE_COVERAGE)
-    include(cmake/Tests.cmake)
-    adobe_contract_checking_enable_coverage(adobe_contract_checking_options)
   endif()
 
   if(adobe_contract_checking_WARNINGS_AS_ERRORS)

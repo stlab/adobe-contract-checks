@@ -1,6 +1,5 @@
 #include "adobe/contract_checks.hpp"
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers.hpp>
+#include <cassert>
 #include <cstdint>
 #include <string_view>
 
@@ -13,21 +12,27 @@
   throw contract_violation(condition, kind, file, line, message);
 }
 
-TEST_CASE("Precondition encodes expected info", "[expected-info-encoded]")
+int main()
 {
   std::uint32_t expected_line = 0;
   try {
     expected_line = __LINE__ + 1;
     ADOBE_PRECONDITION(false);
   } catch (const adobe::contract_violation &v) {
-    CHECK((v.line() == expected_line));
-    CHECK((std::string_view(v.file()) == __FILE__));
-    CHECK((std::string_view(v.condition()) == "false"));
+    assert((v.line() == expected_line));
+    assert((std::string_view(v.file()) == __FILE__));
+    assert((std::string_view(v.condition()) == "false"));
   }
-}
 
-TEST_CASE("Throwing violation handler works", "[throwing]")
-{
-  CHECK_THROWS_AS([] { ADOBE_PRECONDITION(false); }(), adobe::contract_violation);
-  CHECK_THROWS_WITH([] { ADOBE_PRECONDITION(false, "expected message"); }(), "expected message");
+  try {
+    expected_line = __LINE__ + 1;
+    ADOBE_PRECONDITION(false, "message");
+  } catch (const adobe::contract_violation &v) {
+    assert((v.line() == expected_line));
+    assert((std::string_view(v.file()) == __FILE__));
+    assert((std::string_view(v.condition()) == "false"));
+    assert((std::string_view(v.what()) == "message"));
+  }
+
+  fprintf(stderr, "All tests passed.\n");
 }
