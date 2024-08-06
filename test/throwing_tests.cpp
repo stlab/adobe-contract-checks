@@ -1,7 +1,9 @@
 #include "adobe/contract_checks.hpp"
-#include <cassert>
 #include <cstdint>
 #include <string_view>
+
+#undef NDEBUG
+#include <cassert>
 
 [[noreturn]] void ::adobe::contract_violated(const char *const condition,
   ::adobe::contract_violation::kind_t kind,
