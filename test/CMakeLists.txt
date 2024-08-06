@@ -72,7 +72,6 @@ adobe_contract_checking_apply_standard_options(throwing_tests)
 target_link_libraries(
   throwing_tests
   PRIVATE
-  # adobe_contract_checking::sample_library
   adobe-contract-checking
   Catch2::Catch2WithMain)
 

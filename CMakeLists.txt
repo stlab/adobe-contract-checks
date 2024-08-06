@@ -58,7 +58,7 @@ add_library(adobe_contract_checking::adobe_contract_checking_warnings ALIAS adob
 add_subdirectory(configured_files)
 
 # Adding the src:
-add_subdirectory(src)
+# add_subdirectory(src)
 
 # STUFF WE WANT TO KEEP
 #
@@ -98,7 +98,6 @@ endif()
 include(CTest)
 
 if(BUILD_TESTING)
-  message(AUTHOR_WARNING "Building Tests. Be sure to check out test/constexpr_tests.cpp for constexpr testing")
   add_subdirectory(test)
 endif()
 

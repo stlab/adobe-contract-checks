@@ -1,5 +1,4 @@
 include(cmake/SystemLink.cmake)
-include(cmake/LibFuzzer.cmake)
 include(CMakeDependentOption)
 include(CheckCXXCompilerFlag)
 
@@ -78,15 +77,6 @@ macro(adobe_contract_checking_setup_options)
       adobe_contract_checking_ENABLE_CACHE)
   endif()
 
-  adobe_contract_checking_check_libfuzzer_support(LIBFUZZER_SUPPORTED)
-  if(LIBFUZZER_SUPPORTED AND (adobe_contract_checking_ENABLE_SANITIZER_ADDRESS OR adobe_contract_checking_ENABLE_SANITIZER_THREAD OR adobe_contract_checking_ENABLE_SANITIZER_UNDEFINED))
-    set(DEFAULT_FUZZER ON)
-  else()
-    set(DEFAULT_FUZZER OFF)
-  endif()
-
-  option(adobe_contract_checking_BUILD_FUZZ_TESTS "Enable fuzz testing executable" ${DEFAULT_FUZZER})
-
 endmacro()
 
 macro(adobe_contract_checking_global_options)
@@ -99,7 +89,7 @@ macro(adobe_contract_checking_global_options)
 
   if(adobe_contract_checking_ENABLE_HARDENING AND adobe_contract_checking_ENABLE_GLOBAL_HARDENING)
     include(cmake/Hardening.cmake)
-    if(NOT SUPPORTS_UBSAN 
+    if(NOT SUPPORTS_UBSAN
        OR adobe_contract_checking_ENABLE_SANITIZER_UNDEFINED
        OR adobe_contract_checking_ENABLE_SANITIZER_ADDRESS
        OR adobe_contract_checking_ENABLE_SANITIZER_THREAD
@@ -185,7 +175,7 @@ macro(adobe_contract_checking_local_options)
 
   if(adobe_contract_checking_ENABLE_HARDENING AND NOT adobe_contract_checking_ENABLE_GLOBAL_HARDENING)
     include(cmake/Hardening.cmake)
-    if(NOT SUPPORTS_UBSAN 
+    if(NOT SUPPORTS_UBSAN
        OR adobe_contract_checking_ENABLE_SANITIZER_UNDEFINED
        OR adobe_contract_checking_ENABLE_SANITIZER_ADDRESS
        OR adobe_contract_checking_ENABLE_SANITIZER_THREAD
