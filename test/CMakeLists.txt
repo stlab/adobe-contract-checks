@@ -64,9 +64,6 @@ adobe_contract_checking_add_abort_test(
   precondition_failure_output
   "precondition_failure_output\.cpp:9999: Precondition violated [(]false[)]")
 
-adobe_contract_checking_add_minimal_failure_test(
-  precondition_failure_minimal "")
-
 adobe_contract_checking_add_abort_test(
   precondition_failure_with_message_output
   "precondition_failure_with_message_output\.cpp:9999: Precondition violated \(false\)\. expected message")
@@ -82,4 +79,7 @@ add_test(NAME verify_throwing_tests COMMAND ${CMAKE_COMMAND} -E env $<TARGET_FIL
 set_tests_properties(verify_throwing_tests PROPERTIES
   WILL_FAIL NO
   PASS_REGULAR_EXPRESSION "passed"
+
+adobe_contract_checking_add_minimal_failure_test(
+  precondition_failure_minimal "")
 )
