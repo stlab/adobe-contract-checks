@@ -157,19 +157,12 @@ jobs:
         run: |
           cmake --build ./build --config ${{matrix.build_type}}
 
-      - name: Unix - Test
-        if: runner.os != 'Windows'
+      - name: Test
         working-directory: ./build
         # Execute tests defined by the CMake configuration.
         # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
         run: |
-          ctest --verbose -C ${{matrix.build_type}}
-
-      - name: Windows - Test
-        if: runner.os == 'Windows'
-        working-directory: ./build
-        run: |
-          ctest --verbose -C ${{matrix.build_type}}
+          ctest --output-on-failure --timeout 20 -C ${{matrix.build_type}}
 
       - name: CPack
         if: matrix.package_generator != ''
