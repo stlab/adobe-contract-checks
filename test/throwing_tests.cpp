@@ -36,5 +36,6 @@ int main()
     assert((std::string_view(v.what()) == "message"));
   }
 
-  fprintf(stderr, "passed\n");
+  (void)fprintf(stderr, "passed\n");
+  (void)fflush(stderr);
 }

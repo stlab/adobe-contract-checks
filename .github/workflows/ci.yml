@@ -163,13 +163,13 @@ jobs:
         # Execute tests defined by the CMake configuration.
         # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
         run: |
-          ctest -C ${{matrix.build_type}}
+          ctest -verbose -C ${{matrix.build_type}}
 
       - name: Windows - Test
         if: runner.os == 'Windows'
         working-directory: ./build
         run: |
-          ctest -C ${{matrix.build_type}}
+          ctest --verbose -C ${{matrix.build_type}}
 
       - name: CPack
         if: matrix.package_generator != ''
