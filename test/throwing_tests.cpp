@@ -26,8 +26,12 @@ bool failed = false;
 
 int main()
 {
+  (void)fprintf(stderr, "####START#### %s\n", __FILE__);
+  (void)fflush(stderr);
   std::uint32_t expected_line = 0;
   try {
+    (void)fprintf(stderr, "####TEST 1#### %s\n", __FILE__);
+    (void)fflush(stderr);
     expected_line = __LINE__ + 1;
     ADOBE_PRECONDITION(false);
   } catch (const adobe::contract_violation &v) {
@@ -38,6 +42,8 @@ int main()
   }
 
   try {
+    (void)fprintf(stderr, "####TEST 2#### %s\n", __FILE__);
+    (void)fflush(stderr);
     expected_line = __LINE__ + 1;
     ADOBE_PRECONDITION(false, "message");
   } catch (const adobe::contract_violation &v) {
