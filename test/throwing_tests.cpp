@@ -5,7 +5,7 @@
 #undef NDEBUG
 #include <cassert>
 
-/* [[noreturn]] */ void ::adobe::contract_violated(const char *const condition,
+[[noreturn]] void ::adobe::contract_violated(const char *const condition,
   ::adobe::contract_violation::kind_t kind,
   const char *file,
   std::uint32_t line,
