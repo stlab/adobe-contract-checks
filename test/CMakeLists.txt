@@ -77,5 +77,5 @@ target_link_libraries(
   add_test(NAME verify_throwing_tests COMMAND ${CMAKE_COMMAND} -E env $<TARGET_FILE:throwing_tests>)
   set_tests_properties(verify_throwing_tests PROPERTIES
     WILL_FAIL NO
-    PASS_REGULAR_EXPRESSION "All tests passed."
+    PASS_REGULAR_EXPRESSION "passed"
   )

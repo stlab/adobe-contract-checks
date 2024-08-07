@@ -36,5 +36,5 @@ int main()
     assert((std::string_view(v.what()) == "message"));
   }
 
-  fprintf(stderr, "All tests passed.\n");
+  fprintf(stderr, "passed\n");
 }
