@@ -39,6 +39,10 @@ int main()
     ASSERT((v.line() == expected_line));
     ASSERT((std::string_view(v.file()) == __FILE__));
     ASSERT((std::string_view(v.condition()) == "false"));
+  } catch (...) {
+    (void)fprintf(stderr, "Unexpected exception\n");
+    (void)fflush(stderr);
+    failed = true;
   }
 
   try {
@@ -52,6 +56,10 @@ int main()
     ASSERT((std::string_view(v.file()) == __FILE__));
     ASSERT((std::string_view(v.condition()) == "false"));
     ASSERT((std::string_view(v.what()) == "message"));
+  } catch (...) {
+    (void)fprintf(stderr, "Unexpected exception\n");
+    (void)fflush(stderr);
+    failed = true;
   }
 
   (void)fprintf(stderr, failed ? "failed\n" : "passed\n");
