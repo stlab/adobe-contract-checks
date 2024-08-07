@@ -27,7 +27,10 @@ function(adobe_contract_checking_add_abort_test base_name expected_output_re)
   add_executable(${base_name} ${base_name}.cpp abort_detection.cpp)
   adobe_contract_checking_apply_standard_options(${base_name})
   target_link_libraries(${base_name} PRIVATE adobe-contract-checking)
-  add_test(NAME verify_${base_name} COMMAND $<TARGET_FILE:${base_name}>)
+  # we pass through the cmake command because typical break behaviors
+  # include raising SIGILL, which will force CMake to report the test
+  # as a failure.
+  add_test(NAME verify_${base_name} COMMAND ${CMAKE_COMMAND} -E env $<TARGET_FILE:${base_name}>)
   set_tests_properties(verify_${base_name} PROPERTIES
     PASS_REGULAR_EXPRESSION "${expected_output_re}.*##ABORTED##"
   )
