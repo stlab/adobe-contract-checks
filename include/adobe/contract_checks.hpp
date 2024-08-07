@@ -89,7 +89,7 @@ public:
 // The handler for contract violations, defined in the client's code.
 //
 // A default handler can be injected using ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER().
-/* [[noreturn]] */ void contract_violated(const char *condition,
+[[noreturn]] void contract_violated(const char *condition,
   contract_violation::kind_t kind,
   const char *file,
   std::uint32_t line,
