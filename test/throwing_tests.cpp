@@ -14,12 +14,14 @@
   throw contract_violation(condition, kind, file, line, message);
 }
 
+bool failed = false;
+
 #define ASSERT(condition)                                             \
   if (condition) {                                                    \
   } else {                                                            \
     (void)std::fprintf(stderr, "Assertion failed: %s\n", #condition); \
     (void)std::fflush(stderr);                                        \
-    std::abort();                                                     \
+    failed = true;                                                    \
   }
 
 int main()
@@ -29,6 +31,7 @@ int main()
     expected_line = __LINE__ + 1;
     ADOBE_PRECONDITION(false);
   } catch (const adobe::contract_violation &v) {
+    v.print_report();
     ASSERT((v.line() == expected_line));
     ASSERT((std::string_view(v.file()) == __FILE__));
     ASSERT((std::string_view(v.condition()) == "false"));
@@ -38,12 +41,13 @@ int main()
     expected_line = __LINE__ + 1;
     ADOBE_PRECONDITION(false, "message");
   } catch (const adobe::contract_violation &v) {
+    v.print_report();
     ASSERT((v.line() == expected_line));
     ASSERT((std::string_view(v.file()) == __FILE__));
     ASSERT((std::string_view(v.condition()) == "false"));
     ASSERT((std::string_view(v.what()) == "message"));
   }
 
-  (void)fprintf(stderr, "passed\n");
+  (void)fprintf(stderr, failed ? "failed\n" : "passed\n");
   (void)fflush(stderr);
 }
