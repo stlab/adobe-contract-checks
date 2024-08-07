@@ -5,10 +5,31 @@
 #include <exception>
 #include <stdexcept>
 
+// Based on https://gcc.gnu.org/wiki/Visibility
+#if defined _WIN32 || defined __CYGWIN__
+#ifdef BUILDING_DLL
+#ifdef __GNUC__
+#define ADOBE_CONTRACT_VISIBLE __attribute__((dllexport))
+#else
+#define ADOBE_CONTRACT_VISIBLE \
+  __declspec(dllexport)// Note: actually gcc seems to also supports this syntax.
+#endif
+#else
+#ifdef __GNUC__
+#define ADOBE_CONTRACT_VISIBLE __attribute__((dllimport))
+#else
+#define ADOBE_CONTRACT_VISIBLE \
+  __declspec(dllimport)// Note: actually gcc seems to also supports this syntax.
+#endif
+#endif
+#else
+#define ADOBE_CONTRACT_VISIBLE __attribute__((visibility("default")))
+#endif
+
 namespace adobe {
 
 // A violation of some API contract.
-class contract_violation final : public ::std::logic_error
+class ADOBE_CONTRACT_VISIBLE contract_violation final : public ::std::logic_error
 {
 public:
   using kind_t = int;
