@@ -1,5 +1,3 @@
 #include <cstdlib>
 
-int main() {
-  std::abort();
-}
+int main() { std::abort(); }
