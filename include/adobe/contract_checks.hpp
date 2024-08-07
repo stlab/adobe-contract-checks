@@ -130,14 +130,14 @@ public:
 // violations to stdout and invokes std::terminate.
 //
 // See ::adobe::default_contract_violated for details.
-#define ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()                                \
-  /* [[noreturn]] */ void ::adobe::contract_violated(const char *const condition, \
-    ::adobe::contract_violation::kind_t kind,                                     \
-    const char *const file,                                                       \
-    std::uint32_t const line,                                                     \
-    const char *const message)                                                    \
-  {                                                                               \
-    ::adobe::default_contract_violated(condition, kind, file, line, message);     \
+#define ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()                            \
+  [[noreturn]] void ::adobe::contract_violated(const char *const condition,   \
+    ::adobe::contract_violation::kind_t kind,                                 \
+    const char *const file,                                                   \
+    std::uint32_t const line,                                                 \
+    const char *const message)                                                \
+  {                                                                           \
+    ::adobe::default_contract_violated(condition, kind, file, line, message); \
   }
 
 #include <cstdlib>
@@ -153,14 +153,14 @@ public:
 // Injects a definition of ::adobe::contract_violated that stops the
 // program in the most efficient known way, without any diagnostic
 // output.
-#define ADOBE_MINIMAL_CONTRACT_VIOLATION_HANDLER()                      \
-  /* [[noreturn]] */ void ::adobe::contract_violated(const char *const, \
-    ::adobe::contract_violation::kind_t,                                \
-    const char *const,                                                  \
-    std::uint32_t const,                                                \
-    const char *const)                                                  \
-  {                                                                     \
-    INTERNAL_ADOBE_BUILTIN_TRAP();                                      \
+#define ADOBE_MINIMAL_CONTRACT_VIOLATION_HANDLER()                \
+  [[noreturn]] void ::adobe::contract_violated(const char *const, \
+    ::adobe::contract_violation::kind_t,                          \
+    const char *const,                                            \
+    std::uint32_t const,                                          \
+    const char *const)                                            \
+  {                                                               \
+    INTERNAL_ADOBE_BUILTIN_TRAP();                                \
   }
 
 // Contract checking macros take a condition and an optional second argument.
