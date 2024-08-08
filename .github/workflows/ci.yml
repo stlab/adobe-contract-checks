@@ -29,13 +29,13 @@ jobs:
       # and your own projects needs
       matrix:
         os:
-          - ubuntu-20.04
-          - macos-13
-          - windows-2019
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
         compiler:
           # you can specify the version after `-` like "llvm-15.0.2".
-          - llvm-15.0.2
-          - gcc-11
+          - llvm-15
+          - gcc-14
         generator:
           - "Ninja Multi-Config"
         build_type:
@@ -49,17 +49,17 @@ jobs:
 
         exclude:
           # mingw is determined by this author to be too buggy to support
-          - os: windows-2019
-            compiler: gcc-11
+          - os: windows-latest
+            compiler: gcc-14
 
         include:
-          - compiler: gcc-11
+          - compiler: gcc-14
             enable_ipo: On
 
-          - compiler: llvm-15.0.2
+          - compiler: llvm-15
             enable_ipo: Off
 
-          - os: macos-13
+          - os: macos-latest
             enable_ipo: Off
 
           # Set up preferred package generators, for given build configurations
@@ -68,42 +68,42 @@ jobs:
             package_generator: TBZ2
 
           # This exists solely to make sure a non-multiconfig build works
-          - os: ubuntu-20.04
-            compiler: gcc-11
+          - os: ubuntu-latest
+            compiler: gcc-14
             generator: "Unix Makefiles"
             build_type: Debug
             packaging_maintainer_mode: On
             enable_ipo: Off
 
           # Windows msvc builds
-          - os: windows-2022
+          - os: windows-latest
             compiler: msvc
             generator: "Visual Studio 17 2022"
             build_type: Debug
             packaging_maintainer_mode: On
             enable_ipo: On
 
-          - os: windows-2022
+          - os: windows-latest
             compiler: msvc
             generator: "Visual Studio 17 2022"
             build_type: Release
             packaging_maintainer_mode: On
             enable_ipo: On
 
-          - os: windows-2022
+          - os: windows-latest
             compiler: msvc
             generator: "Visual Studio 17 2022"
             build_type: Debug
             packaging_maintainer_mode: Off
 
-          - os: windows-2022
+          - os: windows-latest
             compiler: msvc
             generator: "Visual Studio 17 2022"
             build_type: Release
             packaging_maintainer_mode: Off
             package_generator: ZIP
 
-          - os: windows-2022
+          - os: windows-latest
             compiler: msvc
             generator: "Visual Studio 17 2022"
             build_type: Release
@@ -114,12 +114,12 @@ jobs:
     steps:
       - name: Check for llvm version mismatches
         if: ${{ contains(matrix.compiler, 'llvm') && !contains(matrix.compiler, env.CLANG_TIDY_VERSION) }}
-        uses: actions/github-script@v3
+        uses: actions/github-script@latest
         with:
           script: |
             core.setFailed('There is a mismatch between configured llvm compiler and clang-tidy version chosen')
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@latest
 
       - name: Setup Cache
         uses: ./.github/actions/setup_cache
@@ -130,12 +130,12 @@ jobs:
           generator: ${{ matrix.generator }}
 
       - name: Project Name
-        uses: cardinalby/export-env-action@v2
+        uses: cardinalby/export-env-action@latest
         with:
           envFile: ".github/constants.env"
 
       - name: Setup Cpp
-        uses: aminya/setup-cpp@v1
+        uses: aminya/setup-cpp@latest
         with:
           compiler: ${{ matrix.compiler }}
           vcvarsall: ${{ contains(matrix.os, 'windows' )}}
