@@ -116,7 +116,10 @@ public:
 // TODO: Supply a default terminate handler that calls
 // get_current_exception and reports info.
 
-#if __has_cpp_attribute(unlikely)
+// Recent compilers will support [[unlikely]] even in C++17 mode, but
+// they also will warn if you use this C++20 feature in C++17 mode, so
+// we cannot use it unless we have C++20.
+#if __cplusplus >= 2020002 && __has_cpp_attribute(unlikely)
 // The attribute (if any) that marks the cold path in a contract check.
 #define ADOBE_CONTRACT_VIOLATION_LIKELIHOOD [[unlikely]]
 #else
