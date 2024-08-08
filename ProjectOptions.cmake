@@ -1,5 +1,4 @@
 include(cmake/SystemLink.cmake)
-include(cmake/LibFuzzer.cmake)
 include(CMakeDependentOption)
 include(CheckCXXCompilerFlag)
 
@@ -20,7 +19,6 @@ endmacro()
 
 macro(adobe_contract_checking_setup_options)
   option(adobe_contract_checking_ENABLE_HARDENING "Enable hardening" ON)
-  option(adobe_contract_checking_ENABLE_COVERAGE "Enable coverage reporting" OFF)
   cmake_dependent_option(
     adobe_contract_checking_ENABLE_GLOBAL_HARDENING
     "Attempt to push hardening options to built dependencies"
@@ -73,19 +71,9 @@ macro(adobe_contract_checking_setup_options)
       adobe_contract_checking_ENABLE_UNITY_BUILD
       adobe_contract_checking_ENABLE_CLANG_TIDY
       adobe_contract_checking_ENABLE_CPPCHECK
-      adobe_contract_checking_ENABLE_COVERAGE
       adobe_contract_checking_ENABLE_PCH
       adobe_contract_checking_ENABLE_CACHE)
   endif()
-
-  adobe_contract_checking_check_libfuzzer_support(LIBFUZZER_SUPPORTED)
-  if(LIBFUZZER_SUPPORTED AND (adobe_contract_checking_ENABLE_SANITIZER_ADDRESS OR adobe_contract_checking_ENABLE_SANITIZER_THREAD OR adobe_contract_checking_ENABLE_SANITIZER_UNDEFINED))
-    set(DEFAULT_FUZZER ON)
-  else()
-    set(DEFAULT_FUZZER OFF)
-  endif()
-
-  option(adobe_contract_checking_BUILD_FUZZ_TESTS "Enable fuzz testing executable" ${DEFAULT_FUZZER})
 
 endmacro()
 
@@ -99,7 +87,7 @@ macro(adobe_contract_checking_global_options)
 
   if(adobe_contract_checking_ENABLE_HARDENING AND adobe_contract_checking_ENABLE_GLOBAL_HARDENING)
     include(cmake/Hardening.cmake)
-    if(NOT SUPPORTS_UBSAN 
+    if(NOT SUPPORTS_UBSAN
        OR adobe_contract_checking_ENABLE_SANITIZER_UNDEFINED
        OR adobe_contract_checking_ENABLE_SANITIZER_ADDRESS
        OR adobe_contract_checking_ENABLE_SANITIZER_THREAD
@@ -170,11 +158,6 @@ macro(adobe_contract_checking_local_options)
     )
   endif()
 
-  if(adobe_contract_checking_ENABLE_COVERAGE)
-    include(cmake/Tests.cmake)
-    adobe_contract_checking_enable_coverage(adobe_contract_checking_options)
-  endif()
-
   if(adobe_contract_checking_WARNINGS_AS_ERRORS)
     check_cxx_compiler_flag("-Wl,--fatal-warnings" LINKER_FATAL_WARNINGS)
     if(LINKER_FATAL_WARNINGS)
@@ -185,7 +168,7 @@ macro(adobe_contract_checking_local_options)
 
   if(adobe_contract_checking_ENABLE_HARDENING AND NOT adobe_contract_checking_ENABLE_GLOBAL_HARDENING)
     include(cmake/Hardening.cmake)
-    if(NOT SUPPORTS_UBSAN 
+    if(NOT SUPPORTS_UBSAN
        OR adobe_contract_checking_ENABLE_SANITIZER_UNDEFINED
        OR adobe_contract_checking_ENABLE_SANITIZER_ADDRESS
        OR adobe_contract_checking_ENABLE_SANITIZER_THREAD
