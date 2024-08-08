@@ -65,7 +65,7 @@ public:
         _file,
         static_cast<int>(_line),
         "Unconditional fatal error",
-        what());
+        what());// NOLINT(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
     } else {
       const char *const description =
         _kind == predefined_kind::precondition || _kind == predefined_kind::safety_precondition
@@ -79,7 +79,7 @@ public:
         static_cast<int>(_line),
         description,
         _condition,
-        what());
+        what());// NOLINT(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
     }
   }
 };
