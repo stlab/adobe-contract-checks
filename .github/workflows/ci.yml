@@ -35,7 +35,7 @@ jobs:
         compiler:
           # you can specify the version after `-` like "llvm-15.0.2".
           - llvm-15
-          - gcc-14
+          - gcc-13
         generator:
           - "Ninja Multi-Config"
         build_type:
@@ -50,10 +50,10 @@ jobs:
         exclude:
           # mingw is determined by this author to be too buggy to support
           - os: windows-latest
-            compiler: gcc-14
+            compiler: gcc-13
 
         include:
-          - compiler: gcc-14
+          - compiler: gcc-13
             enable_ipo: On
 
           - compiler: llvm-15
@@ -69,7 +69,7 @@ jobs:
 
           # This exists solely to make sure a non-multiconfig build works
           - os: ubuntu-latest
-            compiler: gcc-14
+            compiler: gcc-13
             generator: "Unix Makefiles"
             build_type: Debug
             packaging_maintainer_mode: On
@@ -143,7 +143,8 @@ jobs:
           cmake: true
           ninja: true
           vcpkg: false
-          ccache: true
+          # ccache is disabled - failing to install on macos-latest with llvm-15
+          ccache: false
           clangtidy: ${{ env.CLANG_TIDY_VERSION }}
 
           cppcheck: true
