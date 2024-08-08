@@ -2,9 +2,9 @@
 // a special message to stderr and exit with EXIT_FAILURE instead of
 // having its usual behavior, allowing our tests to detect that
 // abort() was called by checking for the message.
-#include <cstdlib>
 #include <csignal>
 #include <cstdio>
+#include <cstdlib>
 
 // A signal handler that prints "##ABORTED##" to stderr and exits with
 // EXIT_FAILURE.
@@ -18,13 +18,12 @@ extern "C" void error_test_handle_abort(int /* unused signum */)
 }
 
 // Abort handler installer.
-struct test_override_abort {
+struct test_override_abort
+{
 
   // As a side-effect, installs error_test_handle_abort as a SIGABRT
   // handler.
-  test_override_abort() noexcept {
-    (void)std::signal(SIGABRT, error_test_handle_abort);
-  }
+  test_override_abort() noexcept { (void)std::signal(SIGABRT, error_test_handle_abort); }
 };
 
 // The installation of error_test_handle_abort as an abort handler.
