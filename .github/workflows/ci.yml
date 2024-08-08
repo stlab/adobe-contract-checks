@@ -28,6 +28,10 @@ jobs:
         compiler:
           - Default tools
 
+        exclude:
+          - os: ubuntu-latest
+            compiler: Default tools
+
         include:
           - os: ubuntu-latest
             compiler: clang
