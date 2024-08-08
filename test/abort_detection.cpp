@@ -11,8 +11,9 @@
 //
 // The printed string is chosen to be unlikely to appear by accident
 // in other output.
-extern "C" void error_test_handle_abort(int /* unused signum */) {
-  (void)std::fprintf(stderr, "##ABORTED##"); // NOLINT(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
+extern "C" void error_test_handle_abort(int /* unused signum */)
+{
+  (void)std::fprintf(stderr, "##ABORTED##");// NOLINT
   std::_Exit(EXIT_FAILURE);
 }
 
