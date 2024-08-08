@@ -5,7 +5,7 @@ include(CheckCXXCompilerFlag)
 
 
 macro(adobe_contract_checking_supports_sanitizers)
-  if((CMAKE_CXX_COMPILER_ID MATCHES ".*Clang.*" OR CMAKE_CXX_COMPILER_ID MATCHES ".*GNU.*") AND NOT WIN32)
+  if((CMAKE_CXX_COMPILER_ID MATCHES ".*Clang.*" OR CMAKE_CXX_COMPILER_ID MATCHES ".*GNU.*") AND NOT WIN32 AND NOT (CMAKE_CXX_COMPILER_ID MATCHES ".*GNU.*" AND APPLE))
     set(SUPPORTS_UBSAN ON)
   else()
     set(SUPPORTS_UBSAN OFF)
