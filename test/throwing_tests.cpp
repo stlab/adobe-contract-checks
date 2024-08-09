@@ -1,7 +1,6 @@
 #include "adobe/contract_checks.hpp"
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers.hpp>
 #include <cstdint>
+#include <gtest/gtest.h>
 #include <string_view>
 
 [[noreturn]] void ::adobe::contract_violated(const char *const condition,
@@ -13,31 +12,26 @@
   throw contract_violation(condition, kind, file, line, message);
 }
 
-TEST_CASE("Precondition encodes expected info", "[expected-info-encoded]")
+TEST(Throwing, PreconditionEncodesExpectedInfo)
 {
   std::uint32_t expected_line = 0;
   try {
     expected_line = __LINE__ + 1;
     ADOBE_PRECONDITION(false);
   } catch (const adobe::contract_violation &v) {
-    CHECK((v.line() == expected_line));
-    CHECK((std::string_view(v.file()) == __FILE__));
-    CHECK((std::string_view(v.condition()) == "false"));
+    EXPECT_EQ(v.line(), expected_line);
+    EXPECT_EQ(std::string_view(v.file()), __FILE__);
+    EXPECT_EQ(std::string_view(v.condition()), "false");
   }
 }
 
-#include <cstdio>
-
-TEST_CASE("Throwing violation handler works", "[throwing]")
+TEST(Throwing, ThrowingViolationHandlerWorks)
 {
-  std::printf("step zero\n");// NOLINT
-  (void)std::fflush(stdout);
+  EXPECT_THROW([] { ADOBE_PRECONDITION(false); }(), adobe::contract_violation);
 
-  CHECK_THROWS_AS([] { ADOBE_PRECONDITION(false); }(), adobe::contract_violation);
-  std::printf("step one\n");// NOLINT
-  (void)std::fflush(stdout);
-
-  CHECK_THROWS_WITH([] { ADOBE_PRECONDITION(false, "expected message"); }(), "expected message");
-  std::printf("step two\n");// NOLINT
-  (void)std::fflush(stdout);
+  try {
+    ADOBE_PRECONDITION(false, "expected message");
+  } catch (adobe::contract_violation const &e) {
+    EXPECT_EQ(e.what(), std::string_view("expected message"));
+  }
 }
