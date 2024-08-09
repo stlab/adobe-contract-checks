@@ -52,6 +52,11 @@ jobs:
       - name: Check for clang/clang-tidy version mismatches
         if: ${{ matrix.compiler == 'clang++' }}
         run: |
+          # Don't bother unless clang-tidy is available.
+          if ! clang-tidy --version > /dev/null 2>&1; then
+            exit 0
+          fi
+
           clang_version=$(clang --version | head -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
           clang_tidy_version=$(clang-tidy --version | head -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
           if [ "$clang_version" != "$clang_tidy_version" ]; then
