@@ -1,6 +1,7 @@
 # Build directories and binary files
 build/
-out/
+.*-build/
+.build/
 cmake-build-*/
 
 # User spesific settings
