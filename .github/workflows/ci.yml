@@ -25,6 +25,7 @@ jobs:
           - Linux GCC
           - Linux Clang
           - MacOS Clang
+          - MacOS GCC
           - Windows MSVC
 
         cmake_build_type:
@@ -43,6 +44,10 @@ jobs:
 
           - name: 'MacOS Clang'
             os: macOS-latest
+
+          - name: 'MacOS GCC'
+            os: macOS-latest
+            compiler: g++-14
 
           - name: 'Windows MSVC'
             compiler: cl
