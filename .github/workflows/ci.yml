@@ -50,6 +50,9 @@ jobs:
             exit 1
           fi
 
+      - name: Set up MSVC (Windows)
+        uses: compnerd/gha-setup-vsdevenv@main
+
       - name: Set up latest CMake and Ninja
         uses: lukka/get-cmake@latest
 
