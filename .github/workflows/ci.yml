@@ -86,4 +86,4 @@ jobs:
 
       - name: Test
         run: |
-          ctest -VV --test-dir ./build
+          ctest -VV --timeout 20 --test-dir ./build
