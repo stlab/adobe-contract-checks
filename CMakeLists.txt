@@ -26,13 +26,20 @@ include(cmake/PreventInSourceBuilds.cmake)
 include(ProjectOptions.cmake)
 
 
+message("0. adobe_contract_checking_ENABLE_SANITIZER_ADDRESS=${adobe_contract_checking_ENABLE_SANITIZER_ADDRESS}")
 adobe_contract_checking_setup_options()
+message("1. adobe_contract_checking_ENABLE_SANITIZER_ADDRESS=${adobe_contract_checking_ENABLE_SANITIZER_ADDRESS}")
 
 adobe_contract_checking_global_options()
+message("2. adobe_contract_checking_ENABLE_SANITIZER_ADDRESS=${adobe_contract_checking_ENABLE_SANITIZER_ADDRESS}")
 include(Dependencies.cmake)
 adobe_contract_checking_setup_dependencies()
 
+message("3. adobe_contract_checking_ENABLE_SANITIZER_ADDRESS=${adobe_contract_checking_ENABLE_SANITIZER_ADDRESS}")
+
 adobe_contract_checking_local_options()
+
+message("4. adobe_contract_checking_ENABLE_SANITIZER_ADDRESS=${adobe_contract_checking_ENABLE_SANITIZER_ADDRESS}")
 
 # don't know if this should be set globally from here or not...
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
