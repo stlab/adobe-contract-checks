@@ -81,5 +81,4 @@ jobs:
 
       - name: Test
         run: |
-          ctest --test-dir ./build
-
+          ctest -VV --test-dir ./build
