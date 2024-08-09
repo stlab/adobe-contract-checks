@@ -78,7 +78,7 @@ jobs:
 
       - name: Configure
         run: |
-          cmake -Wno-dev -S . -B ./build -GNinja -DCMAKE_CXX_COMPILER=${{matrix.compiler}} -DCMAKE_BUILD_TYPE=${{matrix.cmake_build_type}} -DCMAKE_CXX_STANDARD=17
+          cmake -Wno-dev -S . -B ./build -GNinja -DCMAKE_CXX_COMPILER=${{matrix.compiler}} -DCMAKE_BUILD_TYPE=${{matrix.cmake_build_type}} -DCMAKE_CXX_STANDARD=17 --trace-expand
 
       - name: Build
         run: |
