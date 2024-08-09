@@ -15,33 +15,42 @@ env:
 
 jobs:
   build-and-test:
-    name: ${{matrix.os}} ${{matrix.compiler}} ${{matrix.cmake_build_type}}
+    name: ${{matrix.name}} (${{matrix.cmake_build_type}})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
 
       matrix:
-        os: [macos-13, ubuntu-latest, windows-latest]
-        cmake_build_type:
-          - Release
-          - Debug
-        compiler:
-          - Default tools
+        name:
+          - Linux GCC
+          - Linux Clang
+          - MacOS Clang
+          - Windows MSVC
 
-        exclude:
-          - os: ubuntu-latest
-            compiler: Default tools
+        cmake_build_type:
+          - Debug
+          - Release
 
         include:
-          - os: ubuntu-latest
-            compiler: clang
+          - compiler: clang++
 
-          - os: ubuntu-latest
-            compiler: gcc
+          - name: 'Linux GCC'
+            compiler: g++
+            os: ubuntu-latest
+
+          - name: 'Linux Clang'
+            os: ubuntu-latest
+
+          - name: 'MacOS Clang'
+            os: macOS-latest
+
+          - name: 'Windows MSVC'
+            compiler: cl
+            os: windows-latest
 
     steps:
       - name: Check for clang/clang-tidy version mismatches
-        if: ${{ matrix.compiler == 'clang' }}
+        if: ${{ matrix.compiler == 'clang++' }}
         run: |
           clang_version=$(clang --version | head -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
           clang_tidy_version=$(clang-tidy --version | head -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
@@ -64,7 +73,7 @@ jobs:
 
       - name: Configure
         run: |
-          cmake -Wno-dev -S . -B ./build -GNinja  -DCMAKE_BUILD_TYPE:STRING=${{matrix.cmake_build_type}} -DCMAKE_CXX_STANDARD=17
+          cmake -Wno-dev -S . -B ./build -GNinja -DCMAKE_CXX_COMPILER=${{matrix.compiler}} -DCMAKE_BUILD_TYPE=${{matrix.cmake_build_type}} -DCMAKE_CXX_STANDARD=17
 
       - name: Build
         run: |
