@@ -30,14 +30,14 @@ TEST_CASE("Precondition encodes expected info", "[expected-info-encoded]")
 
 TEST_CASE("Throwing violation handler works", "[throwing]")
 {
-  std::printf("step zero");// NOLINT
+  std::printf("step zero\n");// NOLINT
   (void)std::fflush(stdout);
 
   CHECK_THROWS_AS([] { ADOBE_PRECONDITION(false); }(), adobe::contract_violation);
-  std::printf("step one");// NOLINT
+  std::printf("step one\n");// NOLINT
   (void)std::fflush(stdout);
 
   CHECK_THROWS_WITH([] { ADOBE_PRECONDITION(false, "expected message"); }(), "expected message");
-  std::printf("step two");// NOLINT
+  std::printf("step two\n");// NOLINT
   (void)std::fflush(stdout);
 }
