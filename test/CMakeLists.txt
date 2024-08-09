@@ -17,7 +17,7 @@ endif()
 
 # ---- Dependencies ----
 
-include(${Catch2_SOURCE_DIR}/extras/Catch.cmake)
+include(GoogleTest)
 
 # Adds a test called verify_<base_name>, built from <base_name>.cpp
 # with test executable target named <base_name>, that passes iff it
@@ -58,14 +58,14 @@ adobe_contract_checking_add_abort_test(
 
 adobe_contract_checking_add_abort_test(
   precondition_failure_output
-  "precondition_failure_output.cpp:9999: Precondition violated [(]1 < 0[)]")
+  "precondition_failure_output.cpp:9999: Precondition violated [(]false[)]")
 
 adobe_contract_checking_add_minimal_failure_test(
   precondition_failure_minimal "[(]1 < [0]")
 
 adobe_contract_checking_add_abort_test(
   precondition_failure_with_message_output
-  "precondition_failure_with_message_output.cpp:9999: Precondition violated [(]1 < 0[)]. expected message")
+  "precondition_failure_with_message_output.cpp:9999: Precondition violated [(]false[)]. expected message")
 
 add_executable(throwing_tests throwing_tests.cpp)
 adobe_contract_checking_apply_standard_options(throwing_tests)
@@ -74,7 +74,7 @@ target_link_libraries(
   PRIVATE
   # adobe_contract_checking::sample_library
   adobe-contract-checking
-  Catch2::Catch2WithMain)
+  GTest::gtest_main)
 
 if(WIN32 AND BUILD_SHARED_LIBS)
   add_custom_command(
@@ -86,17 +86,7 @@ endif()
 
 # automatically discover tests that are defined in catch based test files you can modify the
 # unittests. Set TEST_PREFIX to whatever you want, or use different for different binaries
-catch_discover_tests(
+gtest_discover_tests(
   throwing_tests
   # setting TEST_PREFIX seems to be incompatible with VSCode integrations.
-
-  # TEST_PREFIX
-  # "unittests."
-  REPORTER
-  XML
-  OUTPUT_DIR
-  .
-  OUTPUT_PREFIX
-  "unittests."
-  OUTPUT_SUFFIX
-  .xml)
+)

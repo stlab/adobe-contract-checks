@@ -45,7 +45,13 @@ function(
     endif()
   elseif(MSVC)
     if(${ENABLE_SANITIZER_ADDRESS})
-      list(APPEND SANITIZERS "address")
+      if(GENERATOR_IS_MULTI_CONFIG)
+        list(APPEND SANITIZERS "$<$<NOT:CONFIG:Debug>:address")
+      else()
+        if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+          list(APPEND SANITIZERS "address")
+        endif()
+      endif()
     endif()
     if(${ENABLE_SANITIZER_LEAK}
        OR ${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}

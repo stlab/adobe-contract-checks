@@ -13,8 +13,8 @@
 // in other output.
 extern "C" void error_test_handle_abort(int /* unused signum */)
 {
-  (void)std::fprintf(
-    stderr, "##ABORTED##");// NOLINT(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
+  (void)std::fprintf(stderr, "##ABORTED##");
   std::_Exit(EXIT_FAILURE);
 }
 
