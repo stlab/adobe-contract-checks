@@ -58,14 +58,14 @@ adobe_contract_checking_add_abort_test(
 
 adobe_contract_checking_add_abort_test(
   precondition_failure_output
-  "precondition_failure_output.cpp:9999: Precondition violated [(]1 < 0[)]")
+  "precondition_failure_output.cpp:9999: Precondition violated [(]false[)]")
 
 adobe_contract_checking_add_minimal_failure_test(
   precondition_failure_minimal "[(]1 < [0]")
 
 adobe_contract_checking_add_abort_test(
   precondition_failure_with_message_output
-  "precondition_failure_with_message_output.cpp:9999: Precondition violated [(]1 < 0[)]. expected message")
+  "precondition_failure_with_message_output.cpp:9999: Precondition violated [(]false[)]. expected message")
 
 add_executable(throwing_tests throwing_tests.cpp)
 adobe_contract_checking_apply_standard_options(throwing_tests)
