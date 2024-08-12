@@ -30,6 +30,6 @@ TEST(PreconditionDeathTest, PreconditionFailureOutput)
 TEST(PreconditionDeathTest, PreconditionFailureWithMessageOutput)
 {
 #line 9991
-  EXPECT_ABORT(ADOBE_PRECONDITION(false, ""),
-    "precondition_tests.cpp:999.: Precondition violated \\(false\\)\\.");
+  EXPECT_ABORT(ADOBE_PRECONDITION(false, "expected message"),
+    "precondition_tests.cpp:999.: Precondition violated \\(false\\)\\. expected message");
 }
