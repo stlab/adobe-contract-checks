@@ -1,5 +1,7 @@
 #include "adobe/contract_checks.hpp"
+#ifndef _WIN32
 #include <csignal>
+#endif
 #include <gtest/gtest.h>
 
 ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()
