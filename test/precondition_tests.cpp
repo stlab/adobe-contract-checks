@@ -31,5 +31,5 @@ TEST(PreconditionDeathTest, PreconditionFailureWithMessageOutput)
 {
 #line 9991
   EXPECT_ABORT(ADOBE_PRECONDITION(false, ""),
-    "precondition_tests.cpp:9991: Precondition violated \\(false\\)\\.");
+    "precondition_tests.cpp:999.: Precondition violated \\(false\\)\\.");
 }
