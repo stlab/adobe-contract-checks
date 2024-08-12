@@ -30,6 +30,12 @@ macro(adobe_contract_checking_setup_options)
 
   adobe_contract_checking_supports_sanitizers()
 
+  if(CMAKE_CXX_COMPILER_ID MATCHES ".*GNU.*" AND APPLE)
+    set(SUPPORTS_IPO OFF) # IPO sends compiler into an infinite loop.
+  else()
+    set(SUPPORTS_IPO ON)
+  endif()
+
   if(NOT PROJECT_IS_TOP_LEVEL OR adobe_contract_checking_PACKAGING_MAINTAINER_MODE)
     option(adobe_contract_checking_ENABLE_IPO "Enable IPO/LTO" OFF)
     option(adobe_contract_checking_WARNINGS_AS_ERRORS "Treat Warnings As Errors" OFF)
@@ -45,7 +51,7 @@ macro(adobe_contract_checking_setup_options)
     option(adobe_contract_checking_ENABLE_PCH "Enable precompiled headers" OFF)
     option(adobe_contract_checking_ENABLE_CACHE "Enable ccache" OFF)
   else()
-    option(adobe_contract_checking_ENABLE_IPO "Enable IPO/LTO" ON)
+    option(adobe_contract_checking_ENABLE_IPO "Enable IPO/LTO" ${SUPPORTS_IPO})
     option(adobe_contract_checking_WARNINGS_AS_ERRORS "Treat Warnings As Errors" ON)
     option(adobe_contract_checking_ENABLE_USER_LINKER "Enable user-selected linker" OFF)
     option(adobe_contract_checking_ENABLE_SANITIZER_ADDRESS "Enable address sanitizer" ${SUPPORTS_ASAN})

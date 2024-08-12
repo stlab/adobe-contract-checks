@@ -1,9 +1,8 @@
 # Build directories and binary files
 build/
-out/
-out/coverage/*
 cmake-build-*/
 .*-build/
+.build/
 conan-cache/
 .cache/
 compile_commands.json
