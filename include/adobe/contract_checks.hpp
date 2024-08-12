@@ -154,6 +154,10 @@ public:
 #define INTERNAL_ADOBE_BUILTIN_TRAP() std::abort()
 #endif
 
+// Part of a workaround for an MSVC preprocessor bug. See
+// https://stackoverflow.com/a/5134656.
+#define INTERNAL_ADOBE_MSVC_EXPAND(x) x
+
 // Injects a definition of ::adobe::contract_violated that stops the
 // program in the most efficient known way, without any diagnostic
 // output.
@@ -184,9 +188,9 @@ public:
 //
 // Expands to a statement that reports a precondition failure (and
 // <message> if supplied) when <condition> is false.
-#define ADOBE_PRECONDITION(...)                                                          \
-  ADOBE_THIRD_ARGUMENT(__VA_ARGS__, ADOBE_PRECONDITION_2, ADOBE_PRECONDITION_1, ignored) \
-  (__VA_ARGS__)
+#define ADOBE_PRECONDITION(...)                    \
+  INTERNAL_ADOBE_MSVC_EXPAND(ADOBE_THIRD_ARGUMENT( \
+    __VA_ARGS__, ADOBE_PRECONDITION_2, ADOBE_PRECONDITION_1, ignored)(__VA_ARGS__))
 
 // Expands to a statement that reports a precondition failure when
 // condition is false.
