@@ -4,6 +4,9 @@
 // abort() was called by checking for the message.
 #include <csignal>
 #include <cstdio>
+#ifdef _WIN32
+#include <cstdlib>
+#endif
 
 // A signal handler that prints "##ABORTED##" to stderr and exits with
 // EXIT_FAILURE.
@@ -14,7 +17,9 @@ extern "C" void error_test_handle_abort(int /* unused signum */)
 {
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
   (void)std::fprintf(stderr, "##ABORTED##");
-  // std::_Exit(EXIT_FAILURE);
+#ifdef _WIN32
+  std::_Exit(EXIT_FAILURE);
+#endif
 }
 
 // Abort handler installer.
