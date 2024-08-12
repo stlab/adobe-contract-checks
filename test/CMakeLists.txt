@@ -23,70 +23,24 @@ include(GoogleTest)
 # with test executable target named <base_name>, that passes iff it
 # calls abort() and outputs a string matching the regular expression
 # <expected_output_re>.
-function(adobe_contract_checking_add_abort_test base_name expected_output_re)
-  add_executable(${base_name} ${base_name}.cpp abort_detection.cpp)
-  adobe_contract_checking_apply_standard_options(${base_name})
-  target_link_libraries(${base_name} PRIVATE adobe-contract-checking)
-  add_test(NAME verify_${base_name} COMMAND $<TARGET_FILE:${base_name}>)
-  set_tests_properties(verify_${base_name} PROPERTIES
-    PASS_REGULAR_EXPRESSION "${expected_output_re}.*##ABORTED##"
-  )
+function(adobe_contract_checking_add_test base_name)
+  add_executable("${base_name}" "${base_name}.cpp")
+  adobe_contract_checking_apply_standard_options("${base_name}")
+  target_link_libraries(
+    "${base_name}"
+    PRIVATE
+    adobe-contract-checking
+    GTest::gtest_main)
+  gtest_discover_tests("${base_name}")
+
+  if(WIN32 AND BUILD_SHARED_LIBS)
+    add_custom_command(
+      TARGET "${base_name}"
+      PRE_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:"${base_name}"> $<TARGET_FILE_DIR:"${base_name}">
+      COMMAND_EXPAND_LISTS)
+  endif()
 endfunction()
 
-# Adds a test called verify_<base_name>, built from <base_name>.cpp
-# with test executable target named <base_name>, that passes iff it
-# exits with an error and does not output a string matching regular
-# expression <unexpected_output_re>.
-function(adobe_contract_checking_add_minimal_failure_test base_name unexpected_output_re)
-  add_executable(${base_name} ${base_name}.cpp)
-  adobe_contract_checking_apply_standard_options(${base_name})
-  target_link_libraries(${base_name} PRIVATE adobe-contract-checking)
-  # we pass through the cmake command because typical break behaviors
-  # include raising SIGILL, which will cause CMake to report the test
-  # as a failure despite the WILL_FAIL setting.
-  add_test(NAME verify_${base_name} COMMAND ${CMAKE_COMMAND} -E env $<TARGET_FILE:${base_name}>)
-  set_tests_properties(verify_${base_name} PROPERTIES
-    WILL_FAIL YES
-    PASS_REGULAR_EXPRESSION "${unexpected_output_re}"
-  )
-endfunction()
-
-adobe_contract_checking_add_abort_test(abort_is_detected "")
-
-adobe_contract_checking_add_abort_test(
-  precondition_failure_aborts "precondition")
-
-adobe_contract_checking_add_abort_test(
-  precondition_failure_output
-  "precondition_failure_output.cpp:9999: Precondition violated [(]false[)]")
-
-adobe_contract_checking_add_minimal_failure_test(
-  precondition_failure_minimal "[(]1 < [0]")
-
-adobe_contract_checking_add_abort_test(
-  precondition_failure_with_message_output
-  "precondition_failure_with_message_output.cpp:9999: Precondition violated [(]false[)]. expected message")
-
-add_executable(throwing_tests throwing_tests.cpp)
-adobe_contract_checking_apply_standard_options(throwing_tests)
-target_link_libraries(
-  throwing_tests
-  PRIVATE
-  # adobe_contract_checking::sample_library
-  adobe-contract-checking
-  GTest::gtest_main)
-
-if(WIN32 AND BUILD_SHARED_LIBS)
-  add_custom_command(
-    TARGET throwing_tests
-    PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:throwing_tests> $<TARGET_FILE_DIR:throwing_tests>
-    COMMAND_EXPAND_LISTS)
-endif()
-
-# automatically discover tests that are defined in catch based test files you can modify the
-# unittests. Set TEST_PREFIX to whatever you want, or use different for different binaries
-gtest_discover_tests(
-  throwing_tests
-  # setting TEST_PREFIX seems to be incompatible with VSCode integrations.
-)
+adobe_contract_checking_add_test(precondition_tests)
+adobe_contract_checking_add_test(throwing_tests)
