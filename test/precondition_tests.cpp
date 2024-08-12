@@ -11,7 +11,7 @@ ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()
 #define EXPECT_ABORT(code, expected_output_regex) \
   EXPECT_DEATH(code, expected_output_regex ".*\n*##ABORTED##");
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define FALSE_CONDITION() " (false)"
+#define FALSE_CONDITION() " \\(false\\)"
 #else
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define EXPECT_ABORT(code, expected_output_regex) \
@@ -22,19 +22,19 @@ ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()
 
 TEST(PreconditionDeathTest, PreconditionFailureAborts)
 {
-  EXPECT_ABORT(ADOBE_PRECONDITION(false), "Precondition violated" FALSE_CONDITION());
+  EXPECT_ABORT(ADOBE_PRECONDITION(false), "Precondition violated \\(false\\)\\.");
 }
 
 TEST(PreconditionDeathTest, PreconditionFailureOutput)
 {
-#line 9999
-  EXPECT_ABORT(ADOBE_PRECONDITION(false),
-    "precondition_tests.cpp:9999: Precondition violated" FALSE_CONDITION());
+#line 9998
+  EXPECT_ABORT(
+    ADOBE_PRECONDITION(false), "precondition_tests.cpp:9999: Precondition violated \\(false\\)\\.");
 }
 
 TEST(PreconditionDeathTest, PreconditionFailureWithMessageOutput)
 {
 #line 99991
   EXPECT_ABORT(ADOBE_PRECONDITION(false, "expected message"),
-    "precondition_tests.cpp:99991: Precondition violated" FALSE_CONDITION() ".*expected message");
+    "precondition_tests.cpp:99991: Precondition violated \\(false\\)\\..*expected message");
 }
