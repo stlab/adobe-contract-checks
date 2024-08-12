@@ -10,14 +10,10 @@ ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define EXPECT_ABORT(code, expected_output_regex) \
   EXPECT_DEATH(code, expected_output_regex ".*\n*##ABORTED##");
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define FALSE_CONDITION() " \\(false\\)"
 #else
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define EXPECT_ABORT(code, expected_output_regex) \
   EXPECT_EXIT(code, testing::KilledBySignal(SIGABRT), expected_output_regex ".*##ABORTED##");
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define FALSE_CONDITION() " \\(false\\)"
 #endif
 
 TEST(PreconditionDeathTest, PreconditionFailureAborts)
