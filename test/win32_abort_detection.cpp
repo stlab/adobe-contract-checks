@@ -15,7 +15,7 @@ extern "C" void error_test_handle_abort(int /* unused signum */)
 {
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
   (void)std::fprintf(stderr, "##ABORTED##");
-  // std::_Exit(EXIT_FAILURE);
+  std::_Exit(EXIT_FAILURE);
 }
 
 // Abort handler installer.
