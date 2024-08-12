@@ -6,11 +6,6 @@
 
 ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()
 
-TEST(PreconditionDeathTest, PreconditionFailureAborts)
-{
-  EXPECT_EXIT(ADOBE_PRECONDITION(false), testing::KilledBySignal(SIGABRT), "precondition");
-}
-
 #ifdef _WIN32
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define EXPECT_ABORT(code, expected_output_regex) \
@@ -20,6 +15,11 @@ TEST(PreconditionDeathTest, PreconditionFailureAborts)
 #define EXPECT_ABORT(code, expected_output_regex) \
   EXPECT_EXIT(code, testing::KilledBySignal(SIGABRT), expected_output_regex ".*##ABORTED##");
 #endif
+
+TEST(PreconditionDeathTest, PreconditionFailureAborts)
+{
+  EXPECT_ABORT(ADOBE_PRECONDITION(false), "precondition");
+}
 
 TEST(PreconditionDeathTest, PreconditionFailureOutput)
 {
