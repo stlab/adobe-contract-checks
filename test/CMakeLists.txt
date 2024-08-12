@@ -24,7 +24,7 @@ include(GoogleTest)
 # calls abort() and outputs a string matching the regular expression
 # <expected_output_re>.
 function(adobe_contract_checking_add_test base_name)
-  add_executable("${base_name}" "${base_name}.cpp" abort_detection.cpp)
+  add_executable("${base_name}" "${base_name}.cpp" win32_abort_detection.cpp)
   adobe_contract_checking_apply_standard_options("${base_name}")
   target_link_libraries(
     "${base_name}"

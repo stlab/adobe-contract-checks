@@ -1,7 +1,8 @@
+#ifdef _WIN32
 // When compiled into an executable, this file causes abort() to print
 // a special message to stderr and exit with EXIT_FAILURE instead of
 // having its usual behavior, allowing our tests to detect that
-// abort() was called by checking for the message.
+// abort() was called by checking for the message on Windows.
 #include <csignal>
 #include <cstdio>
 
@@ -28,3 +29,4 @@ struct test_override_abort
 
 // The installation of error_test_handle_abort as an abort handler.
 const test_override_abort handler{};
+#endif
