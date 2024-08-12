@@ -3,7 +3,7 @@
 // having its usual behavior, allowing our tests to detect that
 // abort() was called by checking for the message.
 #include <csignal>
-#include <cstdio>
+#include <iostream>
 
 // A signal handler that prints "##ABORTED##" to stderr and exits with
 // EXIT_FAILURE.
@@ -13,7 +13,7 @@
 extern "C" void error_test_handle_abort(int /* unused signum */)
 {
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
-  (void)std::fprintf(stderr, "##ABORTED##");
+  std::cerr << "##ABORTED##";
 #ifdef _WIN32
   __debugbreak();
 #endif
