@@ -22,14 +22,14 @@ TEST(PreconditionDeathTest, PreconditionFailureAborts)
 
 TEST(PreconditionDeathTest, PreconditionFailureOutput)
 {
-#line 9998
+#line 998
   EXPECT_ABORT(
-    ADOBE_PRECONDITION(false), "precondition_tests.cpp:9999: Precondition violated \\(false\\)\\.");
+    ADOBE_PRECONDITION(false), "precondition_tests.cpp:999: Precondition violated \\(false\\)\\.");
 }
 
 TEST(PreconditionDeathTest, PreconditionFailureWithMessageOutput)
 {
-#line 99991
+#line 9991
   EXPECT_ABORT(ADOBE_PRECONDITION(false, ""),
-    "precondition_tests.cpp:99991: Precondition violated \\(false\\)\\.");
+    "precondition_tests.cpp:9991: Precondition violated \\(false\\)\\.");
 }
