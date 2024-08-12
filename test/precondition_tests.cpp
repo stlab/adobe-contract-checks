@@ -9,7 +9,7 @@ ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()
 #ifdef _WIN32
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define EXPECT_ABORT(code, expected_output_regex) \
-  EXPECT_DEATH(code, expected_output_regex ".*\\\\n*##ABORTED##");
+  EXPECT_DEATH(code, expected_output_regex ".*\n*##ABORTED##");
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define FALSE_CONDITION() " (false)"
 #else
