@@ -60,8 +60,8 @@ public:
   void print_report() const
   {
     if (_kind == predefined_kind::unconditional_fatal_error) {
-      std::cerr << _file << ":" << _line << ": " << "Unconditional fatal error. " << what()
-                << std::flush;
+      std::cerr << _file << ":" << _line << ": "
+                << "Unconditional fatal error. " << what() << std::flush;
     } else {
       const char *const description =
         _kind == predefined_kind::precondition || _kind == predefined_kind::safety_precondition
