@@ -5,6 +5,7 @@
 // abort() was called by checking for the message on Windows.
 #include <csignal>
 #include <cstdio>
+#include <cstdlib>
 
 // A signal handler that prints "##ABORTED##" to stderr and exits with
 // EXIT_FAILURE.
