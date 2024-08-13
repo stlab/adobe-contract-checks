@@ -84,7 +84,7 @@ jobs:
           fi
 
       - name: Set up Emscripten
-        uses: lovasoa/setup-emscripten@master
+        uses: mymindstorm/setup-emsdk@v14
         if: ${{ contains(matrix.name, 'Emscripten') }}
 
       - name: Set up MSVC (Windows)
