@@ -9,7 +9,7 @@ ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()
 #if defined(GTEST_OS_WINDOWS) || defined(__EMSCRIPTEN__)
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define EXPECT_ABORT(code, expected_output_regex) \
-  EXPECT_DEATH(code, expected_output_regex ".*\n*##ABORTED##");
+  EXPECT_DEATH_IF_SUPPORTED(code, expected_output_regex ".*\n*##ABORTED##");
 #else
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define EXPECT_ABORT(code, expected_output_regex) \
