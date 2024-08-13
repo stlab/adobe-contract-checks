@@ -1,12 +1,12 @@
 #include "adobe/contract_checks.hpp"
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__Fuchsia__)
 #include <csignal>
 #endif
 #include <gtest/gtest.h>
 
 ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__Fuchsia__)
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define EXPECT_ABORT(code, expected_output_regex) \
   EXPECT_DEATH(code, expected_output_regex ".*\n*##ABORTED##");
