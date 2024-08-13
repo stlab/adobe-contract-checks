@@ -24,6 +24,7 @@ jobs:
         name:
           - Linux GCC
           - Linux Clang
+          - Linux Emscripten
           - MacOS Clang
           - MacOS GCC
           - Windows MSVC
@@ -34,6 +35,8 @@ jobs:
 
         include:
           - compiler: clang++
+
+          - cmake-launcher: ''
 
           - name: 'Linux GCC'
             compiler: g++
@@ -52,6 +55,14 @@ jobs:
           - name: 'Windows MSVC'
             compiler: cl
             os: windows-latest
+
+          - name: 'Linux Emscripten'
+            compiler: ''
+            os: ubuntu-latest
+            cmake-launcher: emcmake
+
+    env:
+      compiler: ${{ matrix.compiler && format('-DCMAKE_CXX_COMPILER={0}', matrix.compiler) || '' }}
 
     steps:
       - name: Install cppcheck
@@ -72,6 +83,10 @@ jobs:
             exit 1
           fi
 
+      - name: Set up Emscripten
+        uses: lovasoa/setup-emscripten@master
+        if: ${{ contains(matrix.name, 'Emscripten') }}
+
       - name: Set up MSVC (Windows)
         uses: compnerd/gha-setup-vsdevenv@main
 
@@ -85,7 +100,7 @@ jobs:
 
       - name: Configure
         run: |
-          cmake -Wno-dev -S . -B ./build -GNinja -DCMAKE_CXX_COMPILER=${{matrix.compiler}} -DCMAKE_BUILD_TYPE=${{matrix.cmake_build_type}} -DCMAKE_CXX_STANDARD=17
+          ${{ matrix.cmake-launcher }} cmake -Wno-dev -S . -B ./build -GNinja ${{env.compiler}} -DCMAKE_BUILD_TYPE=${{matrix.cmake_build_type}} -DCMAKE_CXX_STANDARD=17
 
       - name: Build
         run: |
