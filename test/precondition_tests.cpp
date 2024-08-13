@@ -1,8 +1,8 @@
 #include "adobe/contract_checks.hpp"
+#include <gtest/gtest.h>
 #if !defined(GTEST_OS_WINDOWS) && !defined(GTEST_OS_FUCHSIA)
 #include <csignal>
 #endif
-#include <gtest/gtest.h>
 
 ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()
 
