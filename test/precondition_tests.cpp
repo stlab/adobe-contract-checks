@@ -1,12 +1,12 @@
 #include "adobe/contract_checks.hpp"
 #include <gtest/gtest.h>
-#if !defined(GTEST_OS_WINDOWS) && !defined(GTEST_OS_FUCHSIA)
+#if !defined(GTEST_OS_WINDOWS) && !defined(__EMSCRIPTEN__)
 #include <csignal>
 #endif
 
 ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()
 
-#if defined(GTEST_OS_WINDOWS) || defined(GTEST_OS_FUCHSIA)
+#if defined(GTEST_OS_WINDOWS) || defined(__EMSCRIPTEN__)
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define EXPECT_ABORT(code, expected_output_regex) \
   EXPECT_DEATH(code, expected_output_regex ".*\n*##ABORTED##");
