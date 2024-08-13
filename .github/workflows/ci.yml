@@ -54,6 +54,9 @@ jobs:
             os: windows-latest
 
     steps:
+      - name: Install cppcheck
+        run: ${{ runner.os == 'Windows' && 'choco install cppcheck -y' || runner.os == 'macOS' && 'brew install cppcheck' || runner.os == 'Linux' && 'sudo apt-get install cppcheck' }}
+
       - name: Check for clang/clang-tidy version mismatches
         if: ${{ matrix.compiler == 'clang++' }}
         run: |
