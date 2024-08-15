@@ -1,6 +1,6 @@
 # Adobe Contract Checking
 
-This is a library of macros used to check that software
+This library is for checking that software
 [contracts](https://en.wikipedia.org/wiki/Design_by_contract) are
 upheld.  In C++ these checks can be especially important for safety
 because failure to satisfy contracts typically leads to [undefined
@@ -40,7 +40,9 @@ If preconditions are not satisfied under which the function behaves
 
 - Use a contract violation handler (`adobe::contract_violated`) that
   unconditionally terminates the program (rationale: see [About
-  Defensive Programming](#about-defensive-programming)).
+  Defensive Programming](#about-defensive-programming)). The
+  predefined contract violation handlers provided by this library
+  follow this recommendation.
 
 - If your program needs to take emergency shutdown measures before
   termination, put those in a [terminate
@@ -51,7 +53,14 @@ If preconditions are not satisfied under which the function behaves
   [`std::terminate()`](https://en.cppreference.com/w/cpp/error/terminate).
 
      ```c++
-     [[noreturn]] emergency_shutdown
+     #include <cstdlib>
+     #include <exception>
+
+     [[noreturn]] emergency_shutdown() noexcept {
+       // ...in case of a bug, this executes...
+       std::abort();
+     }
+
      [[noreturn]] void ::adobe::contract_violated(
        const char *const condition,
        ::adobe::contract_violation::kind_t kind,
@@ -62,12 +71,14 @@ If preconditions are not satisfied under which the function behaves
        // ...whatever you want here...
        std::terminate();
      }
+
+     int main() {
+       std::set_terminate(emergency_shutdown);
+     }
      ```
 
-The predefined contract violation handlers provided by this library
-follow the recommendations above.
-
-
+  That way, other reasons for unexpected termination such as uncaught
+  exceptions, will still cause emergency shutdown.
 
 ## Rationale
 
