@@ -38,7 +38,9 @@ function(adobe_contract_checking_add_test base_name)
     adobe-contract-checking
     GTest::gtest_main)
   gtest_discover_tests("${base_name}")
-
+  if(EMSCRIPTEN)
+    handle_emscripten_death_tests("${base_name}")
+  endif()
   if(WIN32 AND BUILD_SHARED_LIBS)
     add_custom_command(
       TARGET "${base_name}"
@@ -48,5 +50,27 @@ function(adobe_contract_checking_add_test base_name)
   endif()
 endfunction()
 
+# Turns all tests discovered in <test_executable> by
+# gtest_discover_tests that are named with the "DeathTest" convention
+# into CMake WILL_FAIL tests.
+#
+# It is expected that under emscripten, these tests are actually
+# compiled as non-death tests; i.e. they simply execute the code that
+# is expected to die.  There is no support for checking that the exit
+# code or output meets expectations.
+function(handle_emscripten_death_tests test_executable)
+  set(ctest_include_file "${CMAKE_CURRENT_BINARY_DIR}/${test_executable}_death.cmake")
+  file(WRITE "${ctest_include_file}"
+    "set(death_tests \"\${${test_executable}_TESTS}}\")\n"
+    "list(FILTER death_tests INCLUDE REGEX \"DeathTest\")\n"
+    "set_tests_properties(\${death_tests} PROPERTIES WILL_FAIL YES)\n"
+  )
+  set_property(DIRECTORY
+    APPEND PROPERTY TEST_INCLUDE_FILES "${ctest_include_file}"
+  )
+endfunction()
+
 adobe_contract_checking_add_test(precondition_tests)
 adobe_contract_checking_add_test(throwing_tests)
+
+# adobe_contract_checking_add_test(wrapper_header_tests)
