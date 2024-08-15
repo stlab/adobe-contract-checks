@@ -38,13 +38,13 @@ If preconditions are not satisfied under which the function behaves
 
 ## Recommendations
 
-- Use a contract violation handler (`adobe::contract_violated`) that
+1. Use a contract violation handler (`adobe::contract_violated`) that
   unconditionally terminates the program (rationale: see [About
   Defensive Programming](#about-defensive-programming)). The
   predefined contract violation handlers provided by this library
   follow this recommendation.
 
-- If your program needs to take emergency shutdown measures before
+2. If your program needs to take emergency shutdown measures before
   termination, put those in a [terminate
   handler](https://en.cppreference.com/w/cpp/error/terminate_handler)
   that eventually calls
@@ -53,38 +53,55 @@ If preconditions are not satisfied under which the function behaves
   [`std::terminate()`](https://en.cppreference.com/w/cpp/error/terminate).
 
      ```c++
+     #include <cstdint>
      #include <cstdlib>
      #include <exception>
+     #include <iostream>
 
-     [[noreturn]] emergency_shutdown() noexcept {
-       // ...in case of a bug, this executes...
+     [[noreturn]] void emergency_shutdown() noexcept;
+
+     const std::terminate_handler previous_terminate_handler = std::set_terminate(emergency_shutdown);
+
+     [[noreturn]] void emergency_shutdown() noexcept
+     {
+       // emergency shutdown measures here.
+
+       if (previous_terminate_handler != nullptr) { previous_terminate_handler(); }
        std::abort();
      }
 
-     [[noreturn]] void ::adobe::contract_violated(
-       const char *const condition,
+     [[noreturn]] void ::adobe::contract_violated(const char *const condition,
        ::adobe::contract_violation::kind_t kind,
        const char *const file,
        std::uint32_t const line,
-       const char *const message) noexcept
+       const char *const message)
      {
-       // ...whatever you want here...
+       // whatever you want here.
        std::terminate();
-     }
-
-     int main() {
-       std::set_terminate(emergency_shutdown);
      }
      ```
 
   That way, other reasons for unexpected termination such as uncaught
   exceptions, will still cause emergency shutdown.
 
+3. If your custom contract violation handler needs to print a
+  description of the failure, use [Gnu standard error
+  format](https://www.gnu.org/prep/standards/html_node/Errors.html#Errors),
+  which  will be automatically understood by many tools.  The
+  following expression will print such a report to the standard error
+  stream:
+
+      ```c++
+      adobe::contract_violation(
+        condition, kind, file, line, message).print_report();
+      ```
+
 ## Rationale
 
 ### About Defensive Programming
 
-According to [Wikipedia](https://en.wikipedia.org/wiki/Defensive_programming):
+According to
+[Wikipedia](https://en.wikipedia.org/wiki/Defensive_programming):
 
 > **Defensive programming** is a form of defensive design intended to
 > develop programs that are capable of detecting potential security
