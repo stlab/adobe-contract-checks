@@ -124,10 +124,10 @@ public:
 // we cannot use it unless we have C++20.
 #if __cplusplus >= 2020002 && __has_cpp_attribute(unlikely)
 // The attribute (if any) that marks the cold path in a contract check.
-#define ADOBE_CONTRACT_VIOLATION_LIKELIHOOD [[unlikely]]
+#define INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD [[unlikely]]
 #else
 // The attribute (if any) that marks the cold path in a contract check.
-#define ADOBE_CONTRACT_VIOLATION_LIKELIHOOD
+#define INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD
 #endif
 
 // Injects a definition of ::adobe::contract_violated that reports
@@ -181,24 +181,25 @@ public:
 // to help.
 
 // Expands to its third argument
-#define ADOBE_THIRD_ARGUMENT(arg0, arg1, invocation, ...) invocation
+#define INTERNAL_ADOBE_THIRD_ARGUMENT(arg0, arg1, invocation, ...) invocation
 
 // ADOBE_PRECONDITION(<condition>);
 // ADOBE_PRECONDITION(<condition>, <message: const char*>);
 //
 // Expands to a statement that reports a precondition failure (and
 // <message> if supplied) when <condition> is false.
-#define ADOBE_PRECONDITION(...)                    \
-  INTERNAL_ADOBE_MSVC_EXPAND(ADOBE_THIRD_ARGUMENT( \
-    __VA_ARGS__, ADOBE_PRECONDITION_2, ADOBE_PRECONDITION_1, ignored)(__VA_ARGS__))
+#define ADOBE_PRECONDITION(...)                                                          \
+  INTERNAL_ADOBE_MSVC_EXPAND(INTERNAL_ADOBE_THIRD_ARGUMENT(                              \
+    __VA_ARGS__, INTERNAL_ADOBE_PRECONDITION_2, INTERNAL_ADOBE_PRECONDITION_1, ignored)( \
+    __VA_ARGS__))
 
 // Expands to a statement that reports a precondition failure when
 // condition is false.
-#define ADOBE_PRECONDITION_1(condition)                         \
+#define INTERNAL_ADOBE_PRECONDITION_1(condition)                \
   if (condition)                                                \
     ;                                                           \
   else                                                          \
-    ADOBE_CONTRACT_VIOLATION_LIKELIHOOD                         \
+    INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD                \
                                                                 \
   ::adobe::contract_violated(#condition,                        \
     ::adobe::contract_violation::predefined_kind::precondition, \
@@ -208,11 +209,11 @@ public:
 
 // Expands to a statement that reports a precondition failure and
 // <message: const char*> when condition is false.
-#define ADOBE_PRECONDITION_2(condition, message)                \
+#define INTERNAL_ADOBE_PRECONDITION_2(condition, message)       \
   if (condition)                                                \
     ;                                                           \
   else                                                          \
-    ADOBE_CONTRACT_VIOLATION_LIKELIHOOD                         \
+    INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD                \
                                                                 \
   ::adobe::contract_violated(#condition,                        \
     ::adobe::contract_violation::predefined_kind::precondition, \
