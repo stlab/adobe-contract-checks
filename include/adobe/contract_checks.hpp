@@ -221,7 +221,7 @@ public:
     __LINE__,                                                   \
     message)
 
-#define ADOBE_POSTCONDITION(condition)
-#define ADOBE_INVARIANT(condition)
+#define ADOBE_POSTCONDITION(...) ADOBE_PRECONDITION(__VA_ARGS__)
+#define ADOBE_INVARIANT(...) ADOBE_INVARIANT(__VA_ARGS__)
 
 #endif
