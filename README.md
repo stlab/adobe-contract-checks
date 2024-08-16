@@ -137,6 +137,47 @@ public:
 
 ### Defining a contract violation handler
 
+If you don't use `ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()` to
+inject a definition, you'll need to define this function
+with external linkage:
+
+```c++
+     [[noreturn]] void ::adobe::contract_violated(
+       const char *const condition,
+       ::adobe::contract_violation::kind_t kind,
+       const char *const file,
+       std::uint32_t const line,
+       const char *const message) noexcept;
+```
+
+The parameters are as follows:
+
+- `condition`: a [null-terminated byte
+  string](https://en.cppreference.com/w/cpp/string/byte) string
+  containing the text of the checked condition, or `""` if
+  [`ADOBE_NO_CONTRACT_CONDITION_STRINGS`](#symbols-that-minimize-generated-code-and-data)
+  is set.
+- `kind`: `precondition`, `postcondition`, or `invariant`.
+- `file`: a [null-terminated byte
+  string](https://en.cppreference.com/w/cpp/string/byte) string
+  containing the name of the source file as it was passed to the
+  compiler, or `""` if
+  [`ADOBE_NO_CONTRACT_FILENAME_STRINGS`](#symbols-that-minimize-generated-code-and-datat)
+  is set.
+- `line`: the line number of on which the failing check was written.
+- `message`: the second argument to the failing check macro, or "" if
+  none was passed.
+
+If, against our advice (see [recommendation 1](#recommendations)) you
+decide not to terminate the program in response to a contract
+violation, you will omit `[[noreturn]]` and/or `noexcept`, and define
+the corresponding [preprocessor
+symbols](#contract-handler-definition).
+
+In your release builds you may wish to use a more minimal inline
+violation handler, in which case you'll define
+[`ADOBE_CONTRACT_VIOLATED_INLINE_BODY`](#contract-handler-definition).
+
 ## Recommendations
 
 1. Use a contract violation handler (`adobe::contract_violated`) that
@@ -324,7 +365,14 @@ result of undefined behavior that also scrambled memory or causes
 
 ## Development
 
-Building/Running Tests
+The usual procedures for development with cmake apply.  One typical
+set of commands might be:
+
+```sh
+cmake -Wno-dev -S . -B ../build -GNinja        # configure
+cmake --build ../build                         # build/rebuild after changes
+ctest --output-on-failure --test-dir ../build  # test
+```
 
 ## Reference
 
@@ -361,14 +409,6 @@ endif()
 
 ##### Contract handler definition
 
-- `ADOBE_CONTRACT_VIOLATED_RETURNS`: define this symbol if your
-  contract violation handler, against our advice (see [recommendation
-  1](#recommendations)), can return to its caller.
-
-- `ADOBE_CONTRACT_VIOLATED_THROWS`: define this symbol if your
-  contract violation handler, against our advice (see [recommendation
-  1](#recommendations)), can throw exceptions.
-
 - `ADOBE_CONTRACT_VIOLATED_INLINE_BODY`: if you want the contract
   violation handler to be defined inline, make this symbol expand to
   its body.  When the body is lighter-weight than a call to the
@@ -382,6 +422,14 @@ endif()
   You might use this option in release builds when a minimal handler
   is required.  **Note:** Defining a more complex handler inline
   usually will increase binary sizes and may hurt performance.
+
+- `ADOBE_CONTRACT_VIOLATED_RETURNS`: define this symbol if your
+  contract violation handler, against our advice (see [recommendation
+  1](#recommendations)), can return to its caller.
+
+- `ADOBE_CONTRACT_VIOLATED_THROWS`: define this symbol if your
+  contract violation handler, against our advice (see [recommendation
+  1](#recommendations)), can throw exceptions.
 
 ##### Symbols that minimize generated code and data
 
