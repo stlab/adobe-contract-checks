@@ -16,8 +16,6 @@ public:
   // The predefined kinds of contract violations provided by this library.
   enum predefined_kind : kind_t {
     precondition = 1,
-    // A precondition check that dynamically ensures safety failed.
-    safety_precondition,
     postcondition,
     invariant,
     unconditional_fatal_error
@@ -69,10 +67,9 @@ public:
         what());
     } else {
       const char *const description =
-        _kind == predefined_kind::precondition || _kind == predefined_kind::safety_precondition
-          ? "Precondition violated"
+        _kind == predefined_kind::precondition    ? "Precondition violated"
         : _kind == predefined_kind::postcondition ? "Postcondition not upheld"
-        : _kind == predefined_kind::invariant     ? "Invariant violated"
+        : _kind == predefined_kind::invariant     ? "Invariant not upheld"
                                                   : "Unknown category kind";
       // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
       std::fprintf(stderr,
@@ -124,10 +121,10 @@ public:
 // we cannot use it unless we have C++20.
 #if __cplusplus >= 2020002 && __has_cpp_attribute(unlikely)
 // The attribute (if any) that marks the cold path in a contract check.
-#define ADOBE_CONTRACT_VIOLATION_LIKELIHOOD [[unlikely]]
+#define INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD [[unlikely]]
 #else
 // The attribute (if any) that marks the cold path in a contract check.
-#define ADOBE_CONTRACT_VIOLATION_LIKELIHOOD
+#define INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD
 #endif
 
 // Injects a definition of ::adobe::contract_violated that reports
@@ -181,24 +178,25 @@ public:
 // to help.
 
 // Expands to its third argument
-#define ADOBE_THIRD_ARGUMENT(arg0, arg1, invocation, ...) invocation
+#define INTERNAL_ADOBE_THIRD_ARGUMENT(arg0, arg1, invocation, ...) invocation
 
 // ADOBE_PRECONDITION(<condition>);
 // ADOBE_PRECONDITION(<condition>, <message: const char*>);
 //
 // Expands to a statement that reports a precondition failure (and
 // <message> if supplied) when <condition> is false.
-#define ADOBE_PRECONDITION(...)                    \
-  INTERNAL_ADOBE_MSVC_EXPAND(ADOBE_THIRD_ARGUMENT( \
-    __VA_ARGS__, ADOBE_PRECONDITION_2, ADOBE_PRECONDITION_1, ignored)(__VA_ARGS__))
+#define ADOBE_PRECONDITION(...)                                                          \
+  INTERNAL_ADOBE_MSVC_EXPAND(INTERNAL_ADOBE_THIRD_ARGUMENT(                              \
+    __VA_ARGS__, INTERNAL_ADOBE_PRECONDITION_2, INTERNAL_ADOBE_PRECONDITION_1, ignored)( \
+    __VA_ARGS__))
 
 // Expands to a statement that reports a precondition failure when
 // condition is false.
-#define ADOBE_PRECONDITION_1(condition)                         \
+#define INTERNAL_ADOBE_PRECONDITION_1(condition)                \
   if (condition)                                                \
     ;                                                           \
   else                                                          \
-    ADOBE_CONTRACT_VIOLATION_LIKELIHOOD                         \
+    INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD                \
                                                                 \
   ::adobe::contract_violated(#condition,                        \
     ::adobe::contract_violation::predefined_kind::precondition, \
@@ -208,11 +206,11 @@ public:
 
 // Expands to a statement that reports a precondition failure and
 // <message: const char*> when condition is false.
-#define ADOBE_PRECONDITION_2(condition, message)                \
+#define INTERNAL_ADOBE_PRECONDITION_2(condition, message)       \
   if (condition)                                                \
     ;                                                           \
   else                                                          \
-    ADOBE_CONTRACT_VIOLATION_LIKELIHOOD                         \
+    INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD                \
                                                                 \
   ::adobe::contract_violated(#condition,                        \
     ::adobe::contract_violation::predefined_kind::precondition, \
@@ -220,7 +218,7 @@ public:
     __LINE__,                                                   \
     message)
 
-#define ADOBE_POSTCONDITION(condition)
-#define ADOBE_INVARIANT(condition)
+#define ADOBE_POSTCONDITION(...) ADOBE_PRECONDITION(__VA_ARGS__)
+#define ADOBE_INVARIANT(...) ADOBE_INVARIANT(__VA_ARGS__)
 
 #endif
