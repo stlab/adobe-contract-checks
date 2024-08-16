@@ -5,21 +5,24 @@ This library is for checking that software
 upheld.  In C++ these checks can be especially important for safety
 because failure to satisfy contracts typically leads to [undefined
 behavior](https://en.wikipedia.org/wiki/Undefined_behavior), which can
-manifest as crashes, data loss, and security vulnerabilities.
+manifest as crashes, data loss, and security vulnerabilities.  This
+library largely improves upon the standard
+[`assert`](https://en.cppreference.com/w/cpp/error/assert) macro.
+
+## Design by Contract
 
 [Design by Contract](https://en.wikipedia.org/wiki/Design_by_contract)
 is *the* industry-standard way to describe the requirements and
 guarantees of any software component.  It is based on three concepts:
 
-- **Precondition**: what the caller of a function must ensure for the
+- **Preconditions**: what the caller of a function must ensure for the
   function to behave as documented.  A precondition violation
-  indicates a bug in the caller, and in that case the call in
-  principle do anything.
+  indicates a bug in the caller.
 
-- **Postcondition**: a function's side-effects and return
+- **Postconditions** describe a function's side-effects and return
   value. Postconditions need not be upheld if the function reports an
   error (such as memory exhaustion), or if preconditions were
-  violated.  Otherwise, a failure to satisfy postconditions indicates
+  violated.  Otherwise, a postcondition violation indicates
   a bug in the callee.
 
 - **Invariants**: conditions that always hold at some point in the
@@ -27,18 +30,91 @@ guarantees of any software component.  It is based on three concepts:
   invariants**, which hold at any point where an instance can be
   inspected from outside the class.
 
-Something about how these go in documentation and this library
-provides corresponding checking macros to check them.
+A function's specification must at least describe its preconditions
+and postconditions, and the specification of a class must describe its
+publicly-visible invariants.  Additionally describing these conditions
+in code and checking them at runtime can be  a powerful way to catch
+bugs early and prevent their damaging effects.
 
-## Usage
+## Basic C++ Usage
 
-- This is a header-only library.  To use it from C++, simply put the
-  `include` directory of this repository in your `#include` path, and
-  `#include <adobe/contract_checks.hpp>`.
+This is a header-only library.  To use it from C++, simply put the
+`include` directory of this repository in your `#include` path, and
+`#include <adobe/contract_checks.hpp>`.
 
-- Example here
+```c++
+#include <adobe/contract_checks.hpp>
+```
 
-- To use this library from CMake, follow this pattern:
+Every executable needs a single contract violation handler that
+determines the program's behavior when a violation is detected.  A
+good starting point is provided by a macro that you can expand in a
+source file such as the one containing your `main` function.
+
+```c++
+ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER() // no semicolon
+```
+
+There are three primary macros used to check contracts, each with two
+forms: `ADOBE_PRECONDITION`, `ADOBE_POSTCONDITION`, and
+`ADOBE_INVARIANT`. Each has one required argument and one optional
+argument:
+
+- `condition`: an expression convertible to `bool`; if `false`, the
+  violation handler is invoked.
+- `message`: an expression convertible to `const char*` pointing to a
+  [null-terminated](https://en.cppreference.com/w/cpp/string/byte)
+  message that is additionally passed to the violation handler. The
+  default value is the empty string, `""`.
+
+For example,
+
+```c++
+#include <adobe/contract_checks.hpp>
+#include <climits>
+
+// A half-open range of integers.
+// - Invariant: start() <= end().
+class int_range {
+  // The lower bound; if the range is non-empty, its
+  // least contained value.
+  int _start;
+  // The upper bound; if the range is non-empty, one
+  // greater than its greatest contained value.
+  int _end;
+
+  void check_invariant() { ADOBE_INVARIANT(start() <= end()); }
+public:
+  // An instance with the given bounds.
+  // Precondition: end >= start
+  int_range(int start, int end) : _start(start), _end(end) {
+    ADOBE_PRECONDITION(end >= start, "invalid range bounds.");
+    check_invariant();
+  }
+
+  // Returns the lower bound: if *this is non-empty, its
+  // least contained value.
+  int start() const { return _start; }
+
+  // Returns the upper bound; if *this is non-empty, one
+  // greater than its greatest contained value.
+  int end() const { return _end; }
+
+  // Increases the upper bound by 1.
+  // Precondition: end() < INT_MAX
+  void grow_rightward() {
+    ADOBE_PRECONDITION(end() < INT_MAX);
+    int old_end = end();
+    _end += 1;
+    ADOBE_POSTCONDITION(end() == old_end + 1);
+    check_invariant();
+  }
+
+  // more methods...
+};
+```
+
+## CMake Usage
 
   ```cmake
   include(FetchContent)
@@ -52,10 +128,10 @@ provides corresponding checking macros to check them.
   endif()
   find_package(adobe-contract-checks)
 
-  add_library(my-library ...)
+  add_library(my-library my-library.cpp)
   target_link_libraries(my-library PRIVATE adobe-contract-checks)
 
-  add_executable(my-executable ...)
+  add_executable(my-executable my-executable.cpp)
   target_link_libraries(my-executable PRIVATE adobe-contract-checks)
   ```
 
@@ -74,6 +150,35 @@ provides corresponding checking macros to check them.
    options](#configuration) can be used to mitigate or eliminate costs
    later if necessary.
 
+3. If you have to prioritize, precondition checks are the most
+   important; they are your last line of defense against undefined
+   behavior.  Postcondition checks overlap somewhat with what will be
+   checked by unit tests.  They still provide value because unit tests
+   don't cover all possible inputs and the checks may fire outside of
+   testing.
+
+   Class invariant checks can give you the most bang for your buck
+   because they can be used to eliminate the need for precondition
+   checks and verbose documentation across many functions.
+
+   ```c++
+   // Returns the day of the week corresponding to the date described
+   // by "<year>-<month>-<day>" (interpreted in ISO standard date
+   // format)
+   day_of_the_week day(int year, int month, int day) {
+     ADOBE_PRECONDITION(is_valid_date(year, month, day));
+     // implementation starts here.
+   }
+
+   // Returns the day of the week corresponding to `d`.
+   day_of_the_week day(date d) {
+     // implementation starts here.
+   }
+   ```
+
+   The second function above benefits by accepting a `date` type whose
+   invariant ensures its validity.
+
 4. The conditions in your checks should not have side-effects that
    change program behavior, because checks are sometimes turned off by
    configuration.
@@ -85,13 +190,16 @@ provides corresponding checking macros to check them.
    (That may mean temporarily storing a return value in a local
    variable so it can be tested.)
 
-4. Give your `struct` or `class` a `bool invariant() const` method that containing `ADOBE_CONTRACT`
+4. Give your `struct` or `class` a `void check_invariant() const`
+   method containing `ADOBE_INVARIANT` invocations.  Invoke it just
+   before returning from each public mutating friend or member
+   function.
 
-6. If a function throws exceptions or can otherwise report an error,
-   don't make call that a precondition violation.  Instead, make that
-   behavior part of the function's specification: document the
-   conditions, the resulting behavior, and test it to make sure that
-   it works.
+6. If a function throws exceptions or can otherwise report an error **to
+   its caller**, don't call that a precondition violation.  Instead,
+   make that behavior part of the function's specification: document
+   the conditions, the resulting behavior, and test it to make sure
+   that it works.
 
 2. If your program needs to take emergency shutdown measures before
    termination, put those in a [terminate
@@ -126,14 +234,14 @@ provides corresponding checking macros to check them.
        ::adobe::contract_violation::kind_t kind,
        const char *const file,
        std::uint32_t const line,
-       const char *const message)
+       const char *const message) noexcept
      {
        // whatever you want here.
        std::terminate();
      }
      ```
 
-   That way, other reasons for unexpected termination such as uncaught
+   That way, other reasons for unexpected termination, such as uncaught
    exceptions, will still cause emergency shutdown.
 
 3. If your custom contract violation handler needs to print a
