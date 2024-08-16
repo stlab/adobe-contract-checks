@@ -16,8 +16,6 @@ public:
   // The predefined kinds of contract violations provided by this library.
   enum predefined_kind : kind_t {
     precondition = 1,
-    // A precondition check that dynamically ensures safety failed.
-    safety_precondition,
     postcondition,
     invariant,
     unconditional_fatal_error
@@ -69,10 +67,9 @@ public:
         what());
     } else {
       const char *const description =
-        _kind == predefined_kind::precondition || _kind == predefined_kind::safety_precondition
-          ? "Precondition violated"
+        _kind == predefined_kind::precondition    ? "Precondition violated"
         : _kind == predefined_kind::postcondition ? "Postcondition not upheld"
-        : _kind == predefined_kind::invariant     ? "Invariant violated"
+        : _kind == predefined_kind::invariant     ? "Invariant not upheld"
                                                   : "Unknown category kind";
       // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
       std::fprintf(stderr,
