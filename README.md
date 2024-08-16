@@ -83,7 +83,7 @@ class int_range {
   // greater than its greatest contained value.
   int _end;
 
-  void check_invariant() { ADOBE_INVARIANT(start() <= end()); }
+  void check_invariant() const { ADOBE_INVARIANT(start() <= end()); }
 public:
   // An instance with the given bounds.
   // Precondition: end >= start
@@ -232,9 +232,9 @@ violation handler, in which case you'll define
    variable so it can be tested.)
 
 4. Give your `struct` or `class` a `void check_invariant() const`
-   method containing `ADOBE_INVARIANT` invocations.  Invoke it just
-   before returning from each public mutating friend or member
-   function.
+   method containing `ADOBE_INVARIANT` invocations.  Invoke it from each 
+   public mutating friend or member function, just before returning, and just before passing 
+   access to `*this` to any component outside the class.
 
 6. If a function throws exceptions or can otherwise report an error **to
    its caller**, don't call that a precondition violation.  Instead,
@@ -297,7 +297,7 @@ violation handler, in which case you'll define
         condition, kind, file, line, message).print_report();
       ```
 
-5. Don't disable critical checks in shipping code unless an measurable
+5. Don't disable critical checks in shipping code unless a measurable
    unacceptable performance cost is found.  In that case, disable the
    expensive checks selectively, e.g.
 
@@ -393,7 +393,7 @@ c++ -D \
 ```
 
 If you are using this project via CMake, defining the same symbol in
-CMake, on the command line or in your will cause all clients of this
+your `CMakeLists.txt` or on the command line will cause all clients of this
 library in your build to use that configuration file.
 
 This library can only have one configuration in an executable, so the
