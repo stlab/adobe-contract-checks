@@ -92,4 +92,3 @@ TEST(Throwing, TwoArgumentFormsEncodeExpectedInfo)
     EXPECT_EQ(std::string_view(v.what()), "% message %");
   }
 }
-
