@@ -70,7 +70,7 @@ function(handle_emscripten_death_tests test_executable)
   )
 endfunction()
 
-adobe_contract_checking_add_test(precondition_tests)
+adobe_contract_checking_add_test(default_handler_tests)
 adobe_contract_checking_add_test(throwing_tests)
 
 # adobe_contract_checking_add_test(wrapper_header_tests)

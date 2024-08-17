@@ -183,42 +183,53 @@ public:
 // ADOBE_PRECONDITION(<condition>);
 // ADOBE_PRECONDITION(<condition>, <message: const char*>);
 //
-// Expands to a statement that reports a precondition failure (and
+// Expands to a statement that reports a precondition violation (with
 // <message> if supplied) when <condition> is false.
-#define ADOBE_PRECONDITION(...)                                                          \
-  INTERNAL_ADOBE_MSVC_EXPAND(INTERNAL_ADOBE_THIRD_ARGUMENT(                              \
-    __VA_ARGS__, INTERNAL_ADOBE_PRECONDITION_2, INTERNAL_ADOBE_PRECONDITION_1, ignored)( \
-    __VA_ARGS__))
+#define ADOBE_PRECONDITION(...) \
+  ADOBE_CONTRACT_CHECK(::adobe::contract_violation::predefined_kind::precondition, __VA_ARGS__)
 
-// Expands to a statement that reports a precondition failure when
-// condition is false.
-#define INTERNAL_ADOBE_PRECONDITION_1(condition)                \
-  if (condition)                                                \
-    ;                                                           \
-  else                                                          \
-    INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD                \
-                                                                \
-  ::adobe::contract_violated(#condition,                        \
-    ::adobe::contract_violation::predefined_kind::precondition, \
-    __FILE__,                                                   \
-    __LINE__,                                                   \
-    "")
+// ADOBE_POSTCONDITION(<condition>);
+// ADOBE_POSTCONDITION(<condition>, <message: const char*>);
+//
+// Expands to a statement that reports a postcondition violation (with
+// <message> if supplied) when <condition> is false.
+#define ADOBE_POSTCONDITION(...) \
+  ADOBE_CONTRACT_CHECK(::adobe::contract_violation::predefined_kind::postcondition, __VA_ARGS__)
 
-// Expands to a statement that reports a precondition failure and
-// <message: const char*> when condition is false.
-#define INTERNAL_ADOBE_PRECONDITION_2(condition, message)       \
-  if (condition)                                                \
-    ;                                                           \
-  else                                                          \
-    INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD                \
-                                                                \
-  ::adobe::contract_violated(#condition,                        \
-    ::adobe::contract_violation::predefined_kind::precondition, \
-    __FILE__,                                                   \
-    __LINE__,                                                   \
-    message)
+// ADOBE_INVARIANT(<condition>);
+// ADOBE_INVARIANT(<condition>, <message: const char*>);
+//
+// Expands to a statement that reports an invariant violation (with
+// <message> if supplied) when <condition> is false.
+#define ADOBE_INVARIANT(...) \
+  ADOBE_CONTRACT_CHECK(::adobe::contract_violation::predefined_kind::invariant, __VA_ARGS__)
 
-#define ADOBE_POSTCONDITION(...) ADOBE_PRECONDITION(__VA_ARGS__)
-#define ADOBE_INVARIANT(...) ADOBE_INVARIANT(__VA_ARGS__)
+// ADOBE_CONTRACT_CHECK(<integer kind>, <condition>);
+// ADOBE_CONTRACT_CHECK(<integer kind>, <condition>, <message: const char*>);
+//
+// Expands to a statement that reports a contract violation of the
+// given kind (with <message>, if supplied) when <condition> is false.
+#define ADOBE_CONTRACT_CHECK(kind, ...)                                                      \
+  INTERNAL_ADOBE_MSVC_EXPAND(INTERNAL_ADOBE_THIRD_ARGUMENT(                                  \
+    __VA_ARGS__, INTERNAL_ADOBE_CONTRACT_CHECK_2, INTERNAL_ADOBE_CONTRACT_CHECK_1, ignored)( \
+    kind, __VA_ARGS__))
+
+// Expands to a statement that reports a contract violation of the
+// given kind when condition is false.
+#define INTERNAL_ADOBE_CONTRACT_CHECK_1(kind, condition) \
+  if (condition)                                         \
+    ;                                                    \
+  else                                                   \
+    INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD         \
+  ::adobe::contract_violated(#condition, kind, __FILE__, __LINE__, "")
+
+// Expands to a statement that reports a contract violation of the
+// given kind, with <message: const char*> when condition is false.
+#define INTERNAL_ADOBE_CONTRACT_CHECK_2(kind, condition, message) \
+  if (condition)                                                  \
+    ;                                                             \
+  else                                                            \
+    INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD                  \
+  ::adobe::contract_violated(#condition, kind, __FILE__, __LINE__, message)
 
 #endif
