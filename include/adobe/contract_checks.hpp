@@ -14,12 +14,7 @@ public:
   using kind_t = int;
 
   // The predefined kinds of contract violations provided by this library.
-  enum predefined_kind : kind_t {
-    precondition = 1,
-    postcondition,
-    invariant,
-    unconditional_fatal_error
-  };
+  enum predefined_kind : kind_t { precondition = 1, postcondition, invariant };
 
 private:
   // A string representation of the condition whose falsity caused this violation to be detected.
@@ -57,29 +52,19 @@ public:
 
   void print_report() const
   {
-    if (_kind == predefined_kind::unconditional_fatal_error) {
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
-      std::fprintf(stderr,
-        "%s:%d: %s: %s\n",
-        _file,
-        static_cast<int>(_line),
-        "Unconditional fatal error",
-        what());
-    } else {
-      const char *const description =
-        _kind == predefined_kind::precondition    ? "Precondition violated"
-        : _kind == predefined_kind::postcondition ? "Postcondition not upheld"
-        : _kind == predefined_kind::invariant     ? "Invariant not upheld"
-                                                  : "Unknown category kind";
-      // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
-      std::fprintf(stderr,
-        "%s:%d: %s (%s). %s\n",
-        _file,
-        static_cast<int>(_line),
-        description,
-        _condition,
-        what());
-    }
+    const char *const description = _kind == predefined_kind::precondition ? "Precondition violated"
+                                    : _kind == predefined_kind::postcondition
+                                      ? "Postcondition not upheld"
+                                    : _kind == predefined_kind::invariant ? "Invariant not upheld"
+                                                                          : "Unknown category kind";
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg,hicpp-vararg)
+    std::fprintf(stderr,
+      "%s:%d: %s (%s). %s\n",
+      _file,
+      static_cast<int>(_line),
+      description,
+      _condition,
+      what());
     (void)std::fflush(stderr);
   }
 };
