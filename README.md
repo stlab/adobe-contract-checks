@@ -423,10 +423,6 @@ endif()
   is required.  **Note:** Defining a more complex handler inline
   usually will increase binary sizes and may hurt performance.
 
-- `ADOBE_CONTRACT_VIOLATED_RETURNS`: define this symbol if your
-  contract violation handler, against our advice (see [recommendation
-  1](#recommendations)), can return to its caller.
-
 - `ADOBE_CONTRACT_VIOLATED_THROWS`: define this symbol if your
   contract violation handler, against our advice (see [recommendation
   1](#recommendations)), can throw exceptions.
