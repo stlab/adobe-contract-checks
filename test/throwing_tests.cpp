@@ -1,3 +1,5 @@
+#define ADOBE_CONTRACT_VIOLATED_THROWS
+
 #include "adobe/contract_checks.hpp"
 #include <cstdint>
 #include <gtest/gtest.h>

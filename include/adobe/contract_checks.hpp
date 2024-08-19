@@ -5,6 +5,12 @@
 #include <exception>
 #include <stdexcept>
 
+#ifdef ADOBE_CONTRACT_VIOLATED_THROWS
+#define INTERNAL_ADOBE_CONTRACT_VIOLATED_NOEXCEPT
+#else
+#define INTERNAL_ADOBE_CONTRACT_VIOLATED_NOEXCEPT noexcept
+#endif
+
 namespace adobe {
 
 // A violation of some API contract.
@@ -76,13 +82,13 @@ public:
   contract_violation::kind_t kind,
   const char *file,
   std::uint32_t line,
-  const char *message);
+  const char *message) INTERNAL_ADOBE_CONTRACT_VIOLATED_NOEXCEPT;
 
 [[noreturn]] inline void default_contract_violated(const char *const condition,
   contract_violation::kind_t kind,
   const char *const file,
   std::uint32_t const line,
-  const char *const message)
+  const char *const message) noexcept
 {
   // This pattern, calling terminate while unwinding, causes most
   // standard libraries to report the exception that was thrown via
@@ -121,7 +127,7 @@ public:
     ::adobe::contract_violation::kind_t kind,                                 \
     const char *const file,                                                   \
     std::uint32_t const line,                                                 \
-    const char *const message)                                                \
+    const char *const message) noexcept                                       \
   {                                                                           \
     ::adobe::default_contract_violated(condition, kind, file, line, message); \
   }
@@ -148,7 +154,7 @@ public:
     ::adobe::contract_violation::kind_t,                          \
     const char *const,                                            \
     std::uint32_t const,                                          \
-    const char *const)                                            \
+    const char *const) noexcept                                   \
   {                                                               \
     INTERNAL_ADOBE_BUILTIN_TRAP();                                \
   }
