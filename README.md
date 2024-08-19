@@ -47,7 +47,7 @@ This is a header-only library.  To use it from C++, simply put the
 ```
 
 Every executable needs a single contract violation handler that
-determines the program's behavior when a violation is detected.  A
+determines the program's behavior when a violation is detected. A
 good starting point is provided by a macro that you can expand in a
 source file such as the one containing your `main` function.
 
