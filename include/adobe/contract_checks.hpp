@@ -7,7 +7,7 @@
 
 // ADOBE_MINIMAL_TRAP(): followed with a semicolon, expands to a
 // minimal statement that stops the program.
-#if defined(__clang__) || defined(__GNUC__) && __GNUC__ < 10
+#if !defined(__EMSCRIPTEN__) && (defined(__clang__) || defined(__GNUC__))
 #define ADOBE_MINIMAL_TRAP() __builtin_trap()
 #elif defined(_MSC_VER)
 #define ADOBE_MINIMAL_TRAP() __debugbreak()
