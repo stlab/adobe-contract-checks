@@ -5,6 +5,37 @@
 #include <exception>
 #include <stdexcept>
 
+// ADOBE_MINIMAL_TRAP(): followed with a semicolon, expands to a
+// minimal statement that stops the program.
+#if !defined(__EMSCRIPTEN__) && (defined(__clang__) || defined(__GNUC__))
+#define ADOBE_MINIMAL_TRAP() __builtin_trap()
+#elif defined(_MSC_VER)
+#define ADOBE_MINIMAL_TRAP() __debugbreak()
+#else
+#define ADOBE_MINIMAL_TRAP() std::abort()
+#endif
+
+// Injects an inline definition of ::adobe::contract_violated that
+// stops the program in the most efficient known way, without any
+// diagnostic output.  This macro is only useful in your
+// ADOBE_CONTRACT_CHECKS_CONFIGURATION file.
+#define ADOBE_MINIMAL_INLINE_CONTRACT_VIOLATION_HANDLER()       \
+  namespace adobe {                                             \
+  [[noreturn]] inline void contract_violated(const char *const, \
+    int,                                                        \
+    const char *const,                                          \
+    std::uint32_t const,                                        \
+    const char *const) noexcept                                 \
+  {                                                             \
+    ADOBE_MINIMAL_TRAP();                                       \
+  }                                                             \
+  }
+
+// Do not move this #include up; the included file needs to be able to use the above macros.
+#ifdef ADOBE_CONTRACT_CHECKS_CONFIGURATION
+#include ADOBE_CONTRACT_CHECKS_CONFIGURATION
+#endif
+
 #ifdef ADOBE_CONTRACT_VIOLATED_THROWS
 #define INTERNAL_ADOBE_CONTRACT_VIOLATED_NOEXCEPT
 #else
@@ -134,30 +165,9 @@ public:
 
 #include <cstdlib>
 
-#if defined(__clang__) || defined(__GNUC__) && __GNUC__ < 10
-#define INTERNAL_ADOBE_BUILTIN_TRAP() __builtin_trap()
-#elif defined(_MSC_VER)
-#define INTERNAL_ADOBE_BUILTIN_TRAP() __debugbreak()
-#else
-#define INTERNAL_ADOBE_BUILTIN_TRAP() std::abort()
-#endif
-
 // Part of a workaround for an MSVC preprocessor bug. See
 // https://stackoverflow.com/a/5134656.
 #define INTERNAL_ADOBE_MSVC_EXPAND(x) x
-
-// Injects a definition of ::adobe::contract_violated that stops the
-// program in the most efficient known way, without any diagnostic
-// output.
-#define ADOBE_MINIMAL_CONTRACT_VIOLATION_HANDLER()                \
-  [[noreturn]] void ::adobe::contract_violated(const char *const, \
-    ::adobe::contract_violation::kind_t,                          \
-    const char *const,                                            \
-    std::uint32_t const,                                          \
-    const char *const) noexcept                                   \
-  {                                                               \
-    INTERNAL_ADOBE_BUILTIN_TRAP();                                \
-  }
 
 // Contract checking macros take a condition and an optional second argument.
 //

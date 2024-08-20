@@ -27,16 +27,18 @@ include(GoogleTest)
 
 # Adds a test called verify_<base_name>, built from <base_name>.cpp
 # with test executable target named <base_name>, that passes iff it
-# calls abort() and outputs a string matching the regular expression
-# <expected_output_re>.
+# exits as expected and outputs a string matching the regular
+# expression <expected_output_re>.  Additional arguments are
+# interpreted as source files.
 function(adobe_contract_checking_add_test base_name)
-  add_executable("${base_name}" "${base_name}.cpp" win32_abort_detection.cpp)
+  add_executable("${base_name}" "${base_name}.cpp" win32_abort_detection.cpp ${ARGN})
   adobe_contract_checking_apply_standard_options("${base_name}")
   target_link_libraries(
     "${base_name}"
     PRIVATE
     adobe-contract-checking
     GTest::gtest_main)
+  target_include_directories("${base_name}" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
   gtest_discover_tests("${base_name}")
   if(EMSCRIPTEN)
     handle_emscripten_death_tests("${base_name}")
@@ -72,5 +74,10 @@ endfunction()
 
 adobe_contract_checking_add_test(default_handler_tests)
 adobe_contract_checking_add_test(throwing_tests)
+
+adobe_contract_checking_add_test(minimal_configuration_tests
+  inline_handler_assurance.cpp)
+target_compile_definitions(minimal_configuration_tests PRIVATE
+  "ADOBE_CONTRACT_CHECKS_CONFIGURATION=\"minimal_configuration.hpp\"")
 
 # adobe_contract_checking_add_test(wrapper_header_tests)

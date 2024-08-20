@@ -390,11 +390,16 @@ ctest --output-on-failure --test-dir ../build  # test
 
 ## Reference
 
-- `ADOBE_MINIMAL_TRAP()`: Invoke this macro to inject minimal code
-  that stops your program; it's usually just one machine instruction
-  and more efficient than calling `terminate()`.  You'd typically use
-  this macro from a minimal contract violation handler (see the
-  example project).
+- `ADOBE_MINIMAL_TRAP()`: Invoke this macro, followed by a semicolon,
+  to inject minimal code that stops your program; it's usually just
+  one machine instruction and more efficient than calling
+  `terminate()`.  You'd typically use this macro from a minimal
+  contract violation handler (see the example project).
+
+- `ADOBE_MINIMAL_INLINE_CONTRACT_VIOLATION_HANDLER()`: Invoke this
+  macro from your
+  [`ADOBE_CONTRACT_CHECKS_CONFIGURATION`](#configuration) file to
+  inject a handler that only invokes `ADOBE_MINIMAL_TRAP`.
 
 ### Configuration
 
