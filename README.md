@@ -144,7 +144,7 @@ with external linkage:
 ```c++
      [[noreturn]] void ::adobe::contract_violated(
        const char *const condition,
-       ::adobe::contract_violation::kind_t kind,
+       int kind,
        const char *const file,
        std::uint32_t const line,
        const char *const message) noexcept;
@@ -156,27 +156,30 @@ The parameters are as follows:
   string](https://en.cppreference.com/w/cpp/string/byte) string
   containing the text of the checked condition, or `""` if
   [`ADOBE_NO_CONTRACT_CONDITION_STRINGS`](#symbols-that-minimize-generated-code-and-data)
-  is set.
-- `kind`: `precondition`, `postcondition`, or `invariant`.
+  is `#defined`.
+- `kind`: 1 for a precondition, 2 for a postcondition, or 3 for an invariant.
 - `file`: a [null-terminated byte
   string](https://en.cppreference.com/w/cpp/string/byte) string
-  containing the name of the source file as it was passed to the
-  compiler, or `""` if
+  containing the name of the source file with the failing check as it
+  was passed to the compiler, or `""` if
   [`ADOBE_NO_CONTRACT_FILENAME_STRINGS`](#symbols-that-minimize-generated-code-and-datat)
-  is set.
-- `line`: the line number of on which the failing check was written.
+  is `#defined`.
+- `line`: the line number on which the failing check was written.
 - `message`: the second argument to the failing check macro, or "" if
-  none was passed.
+  none was passed or if
+  `ADOBE_NO_CONTRACT_MESSAGE_STRINGS`](#symbols-that-minimize-generated-code-and-data)
+  is `#defined`.
 
 If, against our advice (see [recommendation 1](#recommendations)) you
-decide not to terminate the program in response to a contract
-violation, you will omit `[[noreturn]]` and/or `noexcept`, and define
-the corresponding [preprocessor
-symbols](#contract-handler-definition).
+choose to throw an exception in response to a contract violation, you
+will omit `noexcept`, and `#define`
+[`ADOBE_CONTRACT_VIOLATED_THROWS`](#contract-handler-definition).
 
-In your release builds you may wish to use a more minimal inline
-violation handler, in which case you'll define
-[`ADOBE_CONTRACT_VIOLATED_INLINE_BODY`](#contract-handler-definition).
+In release builds you may wish to use a more minimal inline violation
+handler, in which case you should define it in your
+[`ADOBE_CONTRACT_CHECKS_CONFIGURATION`](#configuration) file.  Note
+that defining a more complex handler inline usually will increase
+binary sizes and hurt performance.
 
 ## Recommendations
 
@@ -307,6 +310,17 @@ violation handler, in which case you'll define
    #endif
    ```
 
+6. Use `ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()`, or a custom
+   handler derived from it, in your debug builds.  For release builds,
+   use `ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()` if you can afford
+   to.  To get a sense of how much smaller and efficient code can
+   possibly get without turning off checks, define an inline minimal
+   handler and [disable condition, message, and filename
+   strings](#symbols-that-minimize-generated-code-and-data) (see the
+   example project for how to do this).  Then you can make an informed
+   decision about what kind of handler to use and how much information
+   to generate.
+
 ## Rationale
 
 ### Performance tuning and configuration complexity
@@ -376,6 +390,12 @@ ctest --output-on-failure --test-dir ../build  # test
 
 ## Reference
 
+- `ADOBE_MINIMAL_TRAP()`: Invoke this macro to inject minimal code
+  that stops your program; it's usually just one machine instruction
+  and more efficient than calling `terminate()`.  You'd typically use
+  this macro from a minimal contract violation handler (see the
+  example project).
+
 ### Configuration
 
 The behavior of this library is configured by preprocessor symbols.
@@ -407,21 +427,7 @@ endif()
 
 #### Preprocessor configuration symbols
 
-##### Contract handler definition
-
-- `ADOBE_CONTRACT_VIOLATED_INLINE_BODY`: if you want the contract
-  violation handler to be defined inline, make this symbol expand to
-  its body.  When the body is lighter-weight than a call to the
-  handler would be, an inline handler can limit the code generated at
-  the use site. For example,
-
-  ```c++
-  #define ADOBE_CONTRACT_VIOLATED_INLINE_BODY { ADOBE_BUILTIN_TRAP(); }
-  ```
-
-  You might use this option in release builds when a minimal handler
-  is required.  **Note:** Defining a more complex handler inline
-  usually will increase binary sizes and may hurt performance.
+##### Contract violation handler definition
 
 - `ADOBE_CONTRACT_VIOLATED_THROWS`: define this symbol if your
   contract violation handler, against our advice (see [recommendation
@@ -429,21 +435,33 @@ endif()
 
 ##### Symbols that minimize generated code and data
 
-- `ADOBE_NO_CONTRACT_CONDITION_STRINGS`: define this symbol to
-  suppress the generation of strings describing failed check
-  conditions.  The empty string will be used instead.
-
-- `ADOBE_NO_CONTRACT_FILENAME_STRINGS`: define this symbol to suppress
-  the generation of strings describing the file in which failed checks
-  occurred.  `"<unknown file>"` will be used instead.
-
 - `ADOBE_SKIP_NONCRITICAL_PRECONDITION_CHECKS`: define this symbol to
-  make uses of `ADOBE_NONCRITICAL_PRECONDITION` generate no code.
+  make uses of `ADOBE_NONCRITICAL_PRECONDITION` generate no code.  Be
+  sure you use `ADOBE_NONCRITICAL_PRECONDITION` according to its
+  documentation.
 
 - `ADOBE_SKIP_ALL_CONTRACT_CHECKS`: define this symbol to make all
   contract checking macros generate no code.  Not recommended for
   general use, but can be useful for measuring the overall performance
   impact of checking in a program.
+
+The following symbols change the behavior of the contract checking
+macros so that they generate lighter-weight (and less informative)
+calls to the violation handler.  For example, if you put expensive
+string construction expressions in the second arguments to these
+macros, but define `ADOBE_NO_CONTRACT_MESSAGE_STRINGS`, those
+expressions will never be evaluated.
+
+- `ADOBE_NO_CONTRACT_CONDITION_STRINGS`: define this symbol to
+  suppress the generation of strings describing failed check
+  conditions.  The empty string will be used instead.
+
+- `ADOBE_NO_CONTRACT_MESSAGE_STRINGS`: define this symbol to suppress
+  the expansion of `message` arguments to checking macros.
+
+- `ADOBE_NO_CONTRACT_FILENAME_STRINGS`: define this symbol to suppress
+  the generation of strings describing the file in which failed checks
+  occurred.  `"<unknown file>"` will be used instead.
 
 ------------------
 
