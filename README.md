@@ -167,7 +167,7 @@ The parameters are as follows:
 - `line`: the line number on which the failing check was written.
 - `message`: the second argument to the failing check macro, or "" if
   none was passed or if
-  `ADOBE_NO_CONTRACT_MESSAGE_STRINGS`](#symbols-that-minimize-generated-code-and-data)
+  [`ADOBE_NO_CONTRACT_MESSAGE_STRINGS`](#symbols-that-minimize-generated-code-and-data)
   is `#defined`.
 
 If, against our advice (see [recommendation 1](#recommendations)) you
@@ -400,7 +400,6 @@ ctest --output-on-failure --test-dir ../build  # test
   macro from your
   [`ADOBE_CONTRACT_CHECKS_CONFIGURATION`](#configuration) file to
   inject a handler that only invokes `ADOBE_MINIMAL_TRAP`.
-
 
 ### Configuration
 
