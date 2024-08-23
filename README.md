@@ -58,7 +58,7 @@ damaging effects.
 That said, documentation is the primary vehicle for expressing
 contracts for two reasons:
 
-1. not all contracts can be checked at runtime, e.g. “`p` points to a
+1. Some contracts cannot be checked at runtime, e.g. “`p` points to a
    valid object,” or “the `callback` parameter always returns a value
    from `0` through `1.0`.”
 2. Reasoning locally about code depends on being able to understand
