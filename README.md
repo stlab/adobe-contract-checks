@@ -89,11 +89,11 @@ The first line of documentation above describes the function's
 postcondition.  The second line describes its error reporting,
 separately from the postcondition.  You can eliminate the need to
 document exceptions by setting a project-wide policy that, unless a
-function is `noexcept`, it can throw anything.  Another way is by
-encoding the ability to return an error in the function's
-signature. Documenting which exceptions can be thrown or errors
-reported is not crucial, but documenting the fact that an error can
-occur is.
+function is `noexcept`, it can throw anything.  You can eliminate the
+need to document returned errors by encoding the ability to return an
+error in the function's signature. Documenting *which* exceptions can be
+thrown or errors reported is not crucial, but documenting the fact
+*that* an error can occur is.
 
 Unless otherwise specified in the function's documentation, a reported
 error means all objets the function would otherwise modify are invalid
@@ -188,6 +188,61 @@ public:
   add_executable(my-executable my-executable.cpp)
   target_link_libraries(my-executable PRIVATE adobe-contract-checks)
   ```
+
+## Configuration
+
+The behavior of this library is configured by one preprocessor symbol,
+`ADOBE_CONTRACT_VIOLATION`.  It can have one of three definitions, or
+be left undefined.
+
+- `verbose`: as much information as possible is collected from the
+  site of a detected contract violation and reported to the standard
+  error stream before `std::terminate()` is invoked.  This behavior is
+  also the default if `ADOBE_CONTRACT_VIOLATION` is left undefined.
+
+- `minimal`: When a contract violation is detected, `std::terminate()`
+  is invoked immediately.  Aside from code to check the condition and
+  call `terminate`, none of the arguments to a contract checking macro
+  generates any code or data.
+
+- `unsafe`: Contract checking macros have no effect and generate no
+  code or data.  Not recommended for general use, but can be useful
+  for measuring the overall performance impact of checking in a
+  program.
+
+This library can only have one configuration in an executable, so the
+privilege of choosing a configuration for all components always
+belongs to the top-level project in a build.
+
+To avoid ODR violations, any binary libraries (not built from source)
+that use this library must use the same version of this library, and
+if they use this library in public header files, must have been built
+with the same value of `ADOBE_CONTRACT_VIOLATION`.
+
+In CMake you could use a pattern like this:
+
+```cmake
+if(PROJECT_IS_TOP_LEVEL)
+  # Set adobe-contract-checks configuration default based on build
+  # type.
+  if(CMAKE_BUILD_TYPE EQUALS "Debug")
+    set(default_ADOBE_CONTRACT_VIOLATION "verbose")
+  else()
+    set(default_ADOBE_CONTRACT_VIOLATION "minimal")
+  endif()
+  # declare the option so user can configure on CMake command-line or
+  # in CMakeCache.txt.
+  option(ADOBE_CONTRACT_VIOLATION
+    "Behavior when a contract violation is detected"
+    "${default_ADOBE_CONTRACT_VIOLATION}")
+endif()
+
+# add the preprocessor definition to the C++ compiler command line for
+# all targets.
+if(DEFINED ADOBE_CONTRACT_VIOLATION)
+  add_compile_definitions("ADOBE_CONTRACT_VIOLATION=${ADOBE_CONTRACT_VIOLATION}")
+endif()
+```
 
 ## Recommendations
 
@@ -336,68 +391,11 @@ result of undefined behavior that also scrambled memory or causes
 
 ## Development
 
-The usual procedures for development with cmake apply.  One typical
+The usual procedures for development with CMake apply.  One typical
 set of commands might be:
 
 ```sh
 cmake -Wno-dev -S . -B ../build -GNinja        # configure
 cmake --build ../build                         # build/rebuild after changes
 ctest --output-on-failure --test-dir ../build  # test
-```
-
-## Reference
-
-### Configuration
-
-The behavior of this library is configured by one preprocessor symbol,
-`ADOBE_CONTRACT_VIOLATION`.  It can have one of three definitions, or
-be left undefined.
-
-- `verbose`: as much information as possible is collected from the
-  site of a detected contract violation and reported to the standard
-  error stream before `std::terminate()` is invoked.  This behavior is
-  also the default if `ADOBE_CONTRACT_VIOLATION` is left undefined.
-
-- `minimal`: When a contract violation is detected, `std::terminate()`
-  is invoked immediately.  Aside from code to check the condition and
-  call `terminate`, none of the arguments to a contract checking macro
-  generates any code or data.
-
-- `unsafe`: Contract checking macros have no effect and generate no
-  code or data.  Not recommended for general use, but can be useful
-  for measuring the overall performance impact of checking in a
-  program.
-
-This library can only have one configuration in an executable, so the
-privilege of choosing a configuration for all components always
-belongs to the top-level project in a build.
-
-To avoid ODR violations, any binary libraries (not built from source)
-that use this library must use the same version of this library, and
-if they use this library in public header files, must have been built
-with the same value of `ADOBE_CONTRACT_VIOLATION`.
-
-In CMake you could use a pattern like this:
-
-```cmake
-if(PROJECT_IS_TOP_LEVEL)
-  # Set adobe-contract-checks configuration default based on build
-  # type.
-  if(CMAKE_BUILD_TYPE EQUALS "Debug")
-    set(default_ADOBE_CONTRACT_VIOLATION "verbose")
-  else()
-    set(default_ADOBE_CONTRACT_VIOLATION "minimal")
-  endif()
-  # declare the option so user can configure on CMake command-line or
-  # in CMakeCache.txt.
-  option(ADOBE_CONTRACT_VIOLATION
-    "Behavior when a contract violation is detected"
-    "${default_ADOBE_CONTRACT_VIOLATION}")
-endif()
-
-# add the preprocessor definition to the C++ compiler command line for
-# all targets.
-if(DEFINED ADOBE_CONTRACT_VIOLATION)
-  add_compile_definitions("ADOBE_CONTRACT_VIOLATION=${ADOBE_CONTRACT_VIOLATION}")
-endif()
 ```
