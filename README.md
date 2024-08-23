@@ -168,47 +168,27 @@ public:
 };
 ```
 
-## Basic CMake Usage
-
-  ```cmake
-  include(FetchContent)
-  if(PROJECT_IS_TOP_LEVEL)
-    FetchContent_Declare(
-      adobe-contract-checks
-      GIT_REPOSITORY https://github.com/stlab/adobe-contract-checks.git
-      GIT_TAG        <this library's release version>
-    )
-    FetchContent_MakeAvailable(adobe-contract-checks)
-  endif()
-  find_package(adobe-contract-checks)
-
-  add_library(my-library my-library.cpp)
-  target_link_libraries(my-library PRIVATE adobe-contract-checks)
-
-  add_executable(my-executable my-executable.cpp)
-  target_link_libraries(my-executable PRIVATE adobe-contract-checks)
-  ```
-
 ## Configuration
 
 The behavior of this library is configured by one preprocessor symbol,
-`ADOBE_CONTRACT_VIOLATION`.  It can have one of three definitions, or
-be left undefined.
+`ADOBE_CONTRACT_VIOLATION`.  It can be defined to one of three
+strings, or be left undefined.
 
-- `verbose`: as much information as possible is collected from the
-  site of a detected contract violation and reported to the standard
-  error stream before `std::terminate()` is invoked.  This behavior is
-  also the default if `ADOBE_CONTRACT_VIOLATION` is left undefined.
+- `ADOBE_CONTRACT_VIOLATION=verbose`: as much information as possible
+  is collected from the site of a detected contract violation and
+  reported to the standard error stream before `std::terminate()` is
+  invoked.  This behavior is also the default if
+  `ADOBE_CONTRACT_VIOLATION` is left undefined.
 
-- `minimal`: When a contract violation is detected, `std::terminate()`
-  is invoked immediately.  Aside from code to check the condition and
-  call `terminate`, none of the arguments to a contract checking macro
-  generates any code or data.
+- `ADOBE_CONTRACT_VIOLATION=minimal`: When a contract violation is
+  detected, `std::terminate()` is invoked immediately.  Aside from
+  code to check the condition and call `terminate`, none of the
+  arguments to a contract checking macro generates any code or data.
 
-- `unsafe`: Contract checking macros have no effect and generate no
-  code or data.  Not recommended for general use, but can be useful
-  for measuring the overall performance impact of checking in a
-  program.
+- `ADOBE_CONTRACT_VIOLATION=unsafe`: Contract checking macros have no
+  effect and generate no code or data.  Not recommended for general
+  use, but can be useful for measuring the overall performance impact
+  of checking in a program.
 
 This library can only have one configuration in an executable, so the
 privilege of choosing a configuration for all components always
@@ -219,10 +199,22 @@ that use this library must use the same version of this library, and
 if they use this library in public header files, must have been built
 with the same value of `ADOBE_CONTRACT_VIOLATION`.
 
-In CMake you could use a pattern like this:
+## Basic CMake Usage
+
+To use this library from CMake and uphold the discipline described
+above, you might put something like this in your project's top level
+`CMakeLists.txt`:
 
 ```cmake
+include(FetchContent)
 if(PROJECT_IS_TOP_LEVEL)
+  FetchContent_Declare(
+    adobe-contract-checks
+    GIT_REPOSITORY https://github.com/stlab/adobe-contract-checks.git
+    GIT_TAG        <this library's release version>
+  )
+  FetchContent_MakeAvailable(adobe-contract-checks)
+
   # Set adobe-contract-checks configuration default based on build
   # type.
   if(CMAKE_BUILD_TYPE EQUALS "Debug")
@@ -236,12 +228,22 @@ if(PROJECT_IS_TOP_LEVEL)
     "Behavior when a contract violation is detected"
     "${default_ADOBE_CONTRACT_VIOLATION}")
 endif()
+find_package(adobe-contract-checks)
 
-# add the preprocessor definition to the C++ compiler command line for
-# all targets.
+# Configure usage of this library by all targets the same way.
+# (repeated in each CMakeLists.txt that adds C++ targets).
 if(DEFINED ADOBE_CONTRACT_VIOLATION)
-  add_compile_definitions("ADOBE_CONTRACT_VIOLATION=${ADOBE_CONTRACT_VIOLATION}")
+  add_compile_definitions(
+    "ADOBE_CONTRACT_VIOLATION=${ADOBE_CONTRACT_VIOLATION}")
 endif()
+
+# --- your project's targets -----
+
+add_library(my-library my-library.cpp)
+target_link_libraries(my-library PRIVATE adobe-contract-checks)
+
+add_executable(my-executable my-executable.cpp)
+target_link_libraries(my-executable PRIVATE adobe-contract-checks)
 ```
 
 ## Recommendations
