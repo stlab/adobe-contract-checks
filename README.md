@@ -36,7 +36,7 @@ guarantees of any software component.  It is based on three concepts:
   outside the class, but other invariant checks (especially loop
   invariants) are also useful.
 
-This library provides macros for cheking preconditions
+This library provides macros for checking preconditions
 (`ADOBE_PRECONDITION`) and invariants (`ADOBE_INVARIANT`).
 Postconditions should be checked by unit tests
 ([rationale](#why-this-library-provides-no-postcondition-check)).
