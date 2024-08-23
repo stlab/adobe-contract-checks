@@ -1,3 +1,8 @@
+[![ci](https://github.com/stlab/adobe-contract-checks/actions/workflows/ci.yml/badge.svg)](https://github.com/stlab/adobe-contract-checks/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/stlab/adobe-contract-checks/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/stlab/adobe-contract-checks/actions/workflows/codeql-analysis.yml)
+
+------
+
 # Adobe Contract Checking
 
 This library is for checking that software
@@ -26,15 +31,73 @@ guarantees of any software component.  It is based on three concepts:
   a bug in the callee.
 
 - **Invariants**: conditions that always hold at some point in the
-  code.  The most common and useful kind of invariants are **class
-  invariants**, which hold at any point where an instance can be
-  inspected from outside the class.
+  code.  The most common kind of invariants are **class invariants**,
+  which hold at any point where an instance can be inspected from
+  outside the class, but other invariant checks (especially loop
+  invariants) are also useful.
+
+This library provides macros for cheking preconditions
+(`ADOBE_PRECONDITION`) and invariants (`ADOBE_INVARIANT`).
+Postconditions should be checked by unit tests
+([rationale](#why-this-library-provides-no-postcondition-check)).
+When these precondition or invariant checks fail, the program is
+terminated ([rationale](#about-defensive-programming)).
+
+### Documenting Contracts
 
 A function's specification must at least describe its preconditions
-and postconditions, and the specification of a class must describe its
-publicly-visible invariants.  Additionally describing these conditions
-in code and checking them at runtime can be  a powerful way to catch
-bugs early and prevent their damaging effects.
+and postconditions. The specification of a class must describe its
+publicly-visible invariants.  The minimal documentation required for
+any component is its contract, and usually, a short sentence fragment
+is sufficient to convey all the important information.
+
+Additionally describing these conditions in code and checking them at
+runtime can be  a powerful way to catch bugs early and prevent their
+damaging effects.
+
+That said, documentation is the primary vehicle for expressing
+contracts for two reasons:
+
+1. not all contracts can be checked at runtime, e.g. “`p` points to a
+   valid object,” or “the `callback` parameter always returns a value
+   from `0` through `1.0`.”
+2. Reasoning locally about code depends on being able to understand
+   the contract of each component the code uses without looking at the
+   component's implementation.
+
+#### How Reported Errors Fit In
+
+The condition that causes a function to throw an exception or
+otherwise report an error to its caller should not be treated as a
+precondition.  Instead, make the error reporting behavior part of the
+function's specification: document the behavior and test it to make
+sure that it works.  Also, do not describe the error report as part of
+the postcondition. **Reporting an error to the caller exempts a
+function from fulfilling postconditions** and can be thought of as an
+allowed postcondition failure.
+
+For example:
+
+```c++
+// Returns a pointer to a colorful widget.
+//
+// Throws std::bad_alloc if memory is exhausted.
+std::unique_ptr<Widget> build_widget();
+```
+
+The first line of documentation above describes the function's
+postcondition.  The second line describes its error reporting,
+separately from the postcondition.  You can eliminate the need to
+document exceptions by setting a project-wide policy that, unless a
+function is `noexcept`, it can throw anything.  Another way is by
+encoding the ability to return an error in the function's
+signature. Documenting which exceptions can be thrown or errors
+reported is not crucial, but documenting the fact that an error can
+occur is.
+
+Unless otherwise specified in the function's documentation, a reported
+error means all objets the function would otherwise modify are invalid
+for all uses except as the target of destruction or assignment.
 
 ## Basic C++ Usage
 
@@ -46,26 +109,17 @@ This is a header-only library.  To use it from C++, simply put the
 #include <adobe/contract_checks.hpp>
 ```
 
-Every executable needs a single contract violation handler that
-determines the program's behavior when a violation is detected. A
-good starting point is provided by a macro that you can expand in a
-source file such as the one containing your `main` function.
-
-```c++
-ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER() // no semicolon
-```
-
-There are three primary macros used to check contracts, each with two
-forms: `ADOBE_PRECONDITION`, `ADOBE_POSTCONDITION`, and
-`ADOBE_INVARIANT`. Each has one required argument and one optional
+The two macros used to check contracts,`ADOBE_PRECONDITION` and
+`ADOBE_INVARIANT`, eachtake one required argument and one optional
 argument:
 
-- `condition`: an expression convertible to `bool`; if `false`, the
+- `condition` (required): an expression convertible to `bool`; if `false`, the
   violation handler is invoked.
-- `message`: an expression convertible to `const char*` pointing to a
+- `message` (optional): an expression convertible to `const char*`
+  pointing to a
   [null-terminated](https://en.cppreference.com/w/cpp/string/byte)
   message that is additionally passed to the violation handler. The
-  default value is the empty string, `""`.
+  default `message` value is the empty string, `""`.
 
 For example,
 
@@ -83,6 +137,7 @@ class int_range {
   // greater than its greatest contained value.
   int _end;
 
+  // Fails a contract check if the invariants of `*self` are violated.
   void check_invariant() const { ADOBE_INVARIANT(start() <= end()); }
 public:
   // An instance with the given bounds.
@@ -106,7 +161,6 @@ public:
     ADOBE_PRECONDITION(end() < INT_MAX);
     int old_end = end();
     _end += 1;
-    ADOBE_POSTCONDITION(end() == old_end + 1);
     check_invariant();
   }
 
@@ -114,7 +168,7 @@ public:
 };
 ```
 
-## CMake Usage
+## Basic CMake Usage
 
   ```cmake
   include(FetchContent)
@@ -135,84 +189,34 @@ public:
   target_link_libraries(my-executable PRIVATE adobe-contract-checks)
   ```
 
-### Defining a contract violation handler
-
-If you don't use `ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()` to
-inject a definition, you'll need to define this function
-with external linkage:
-
-```c++
-     [[noreturn]] void ::adobe::contract_violated(
-       const char *const condition,
-       int kind,
-       const char *const file,
-       std::uint32_t const line,
-       const char *const message) noexcept;
-```
-
-The parameters are as follows:
-
-- `condition`: a [null-terminated byte
-  string](https://en.cppreference.com/w/cpp/string/byte) string
-  containing the text of the checked condition, or `""` if
-  [`ADOBE_NO_CONTRACT_CONDITION_STRINGS`](#symbols-that-minimize-generated-code-and-data)
-  is `#defined`.
-- `kind`: 1 for a precondition, 2 for a postcondition, or 3 for an invariant.
-- `file`: a [null-terminated byte
-  string](https://en.cppreference.com/w/cpp/string/byte) string
-  containing the name of the source file with the failing check as it
-  was passed to the compiler, or `""` if
-  [`ADOBE_NO_CONTRACT_FILENAME_STRINGS`](#symbols-that-minimize-generated-code-and-datat)
-  is `#defined`.
-- `line`: the line number on which the failing check was written.
-- `message`: the second argument to the failing check macro, or "" if
-  none was passed or if
-  [`ADOBE_NO_CONTRACT_MESSAGE_STRINGS`](#symbols-that-minimize-generated-code-and-data)
-  is `#defined`.
-
-If, against our advice (see [recommendation 1](#recommendations)) you
-choose to throw an exception in response to a contract violation, you
-will omit `noexcept`, and `#define`
-[`ADOBE_CONTRACT_VIOLATED_THROWS`](#contract-handler-definition).
-
-In release builds you may wish to use a more minimal inline violation
-handler, in which case you should define it in your
-[`ADOBE_CONTRACT_CHECKS_CONFIGURATION`](#configuration) file.  Note
-that defining a more complex handler inline usually will increase
-binary sizes and hurt performance.
-
 ## Recommendations
 
-1. Use a contract violation handler (`adobe::contract_violated`) that
-  unconditionally terminates the program (rationale: see [About
-  Defensive Programming](#about-defensive-programming)). The
-  predefined contract violation handlers provided by this library
-  follow this recommendation.
-
-2. Start by checking whatever you can, and worry about performance
+-  Start by checking whatever you can, and worry about performance
    later. Checks are often critical for safety. [Configuration
    options](#configuration) can be used to mitigate or eliminate costs
    later if necessary.
 
-3. If you have to prioritize, precondition checks are the most
+-  If you have to prioritize, precondition checks are the most
    important; they are your last line of defense against undefined
-   behavior.  Postcondition checks overlap somewhat with what will be
-   checked by unit tests.  They still provide value because unit tests
-   don't cover all possible inputs and the checks may fire outside of
-   testing.
+   behavior.
 
-   Class invariant checks can give you the most bang for your buck
-   because they can be used to eliminate the need for precondition
-   checks and verbose documentation across many functions.
+   Class invariant checks can often give you more bang for your buck,
+   though, because they can be used to eliminate the need for
+   precondition checks and verbose documentation across many
+   functions.
 
    ```c++
    // Returns the day of the week corresponding to the date described
    // by "<year>-<month>-<day>" (interpreted in ISO standard date
-   // format)
+   // format).
+   //
+   // Precondition: "<year>-<month>-<day>" is a valid ISO standard date.
    day_of_the_week day(int year, int month, int day) {
      ADOBE_PRECONDITION(is_valid_date(year, month, day));
      // implementation starts here.
    }
+
+   // ------- vs -------
 
    // Returns the day of the week corresponding to `d`.
    day_of_the_week day(date d) {
@@ -223,41 +227,29 @@ binary sizes and hurt performance.
    The second function above benefits by accepting a `date` type whose
    invariant ensures its validity.
 
-4. The conditions in your checks should not have side-effects that
-   change program behavior, because checks are sometimes turned off by
-   configuration.
+- The conditions in your checks should not have side-effects that
+  change program behavior; readers expect to be able to skip over
+  these checks when reasoning about code.
 
-2. Group all precondition checks immediately after a function's
-   opening brace, and don't allow any code to sneak in before them.
+- Group all precondition checks immediately after a function's
+  opening brace, and don't allow any code to sneak in before them.
 
-3. Group all postcondition checks just before your function returns.
-   (That may mean temporarily storing a return value in a local
-   variable so it can be tested.)
+- Give your `struct` or `class` a `void check_invariant() const`
+  method containing `ADOBE_INVARIANT` invocations, so that invariant
+  checking can be centralized.  Invoke it from each public mutating
+  friend or member function just before each `return` or before
+  `*this` becomes visible to any other component such as a callback
+  parameter.
 
-4. Give your `struct` or `class` a `void check_invariant() const`
-   method containing `ADOBE_INVARIANT` invocations.  Invoke it from each 
-   public mutating friend or member function, just before returning, and just before passing 
-   access to `*this` to any component outside the class.
-
-6. If a function throws exceptions or can otherwise report an error **to
-   its caller**, don't call that a precondition violation.  Instead,
-   make that behavior part of the function's specification: document
-   the conditions, the resulting behavior, and test it to make sure
-   that it works.
-
-2. If your program needs to take emergency shutdown measures before
+- If your program needs to take emergency shutdown measures before
    termination, put those in a [terminate
    handler](https://en.cppreference.com/w/cpp/error/terminate_handler)
    that eventually calls
-   [`std::abort()`](https://en.cppreference.com/w/cpp/utility/program/abort),
-   and have your contract violation handler call
-   [`std::terminate()`](https://en.cppreference.com/w/cpp/error/terminate).
+   [`std::abort()`](https://en.cppreference.com/w/cpp/utility/program/abort).
 
      ```c++
-     #include <cstdint>
      #include <cstdlib>
      #include <exception>
-     #include <iostream>
 
      [[noreturn]] void emergency_shutdown() noexcept;
 
@@ -272,37 +264,18 @@ binary sizes and hurt performance.
          { previous_terminate_handler(); }
        std::abort();
      }
-
-     [[noreturn]] void ::adobe::contract_violated(
-       const char *const condition,
-       ::adobe::contract_violation::kind_t kind,
-       const char *const file,
-       std::uint32_t const line,
-       const char *const message) noexcept
-     {
-       // whatever you want here.
-       std::terminate();
-     }
+     ...
      ```
 
-   That way, other reasons for unexpected termination, such as uncaught
-   exceptions, will still cause emergency shutdown.
+   That way, other reasons for sudden termination, such as
+   uncaught exceptions, will still cause emergency shutdown to execute.
 
-3. If your custom contract violation handler needs to print a
-  description of the failure, use [Gnu standard error
-  format](https://www.gnu.org/prep/standards/html_node/Errors.html#Errors),
-  which  will be automatically understood by many tools.  The
-  following expression will print such a report to the standard error
-  stream:
-
-      ```c++
-      adobe::contract_violation(
-        condition, kind, file, line, message).print_report();
-      ```
-
-5. Don't disable critical checks in shipping code unless a measurable
-   unacceptable performance cost is found.  In that case, disable the
-   expensive checks selectively, e.g.
+- Don't disable critical checks in shipping code unless a measurable
+  unacceptable performance cost is found, and after assessing the risk
+  of undefined behavior should the check be skipped.  In that case,
+  disable the expensive checks selectively. For example, if you have
+  `NDEBUG` defined in your release build, you can enable the check for
+  debug builds only.
 
    ```
    #ifndef NDEBUG // too expensive for release
@@ -310,33 +283,17 @@ binary sizes and hurt performance.
    #endif
    ```
 
-6. Use `ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()`, or a custom
-   handler derived from it, in your debug builds.  For release builds,
-   use `ADOBE_DEFAULT_CONTRACT_VIOLATION_HANDLER()` if you can afford
-   to.  To get a sense of how much smaller and efficient code can
-   possibly get without turning off checks, define an inline minimal
-   handler and [disable condition, message, and filename
-   strings](#symbols-that-minimize-generated-code-and-data) (see the
-   example project for how to do this).  Then you can make an informed
-   decision about what kind of handler to use and how much information
-   to generate.
+## Rationales
 
-## Rationale
+### Why This Library Provides No Postcondition Check
 
-### Performance tuning and configuration complexity
-
-Unfortunately contract checks have some performance cost. If
-programmers fear that writing a check will bake that cost into their
-code, they are likely to skip writing the check altogether.  To
-mitigate that effect, we supply extensive
-[configuration](#configuration) options that allowing projects to tune
-the overheads incurred by checking, _after checks have already been
-written_.
-
-We want programmers to write checks freely; even if for some reason
-checks have to be disabled during regular development, they help to
-document code and can be turned on temporarily to help track down
-difficult bugs.
+Checking postconditions is practically the entire raison d'être of
+unit tests, and many good frameworks for unit testing exist.  Adding a
+postcondition check to this library would just create confusion about
+where postcondition checks should go and the true purpose of unit
+testing. Also postcondition checks for most mutating functions need to
+makes an initial copy of everything being mutated, which can be
+prohibitively expensive even for debug builds.
 
 ### About Defensive Programming
 
@@ -349,10 +306,10 @@ According to
 > continuing function of a piece of software under unforeseen
 > circumstances.
 
-In principle, defensive programming is a good idea.  In practice,
-though, “unforeseen circumstances” usually mean the discovery of a bug
-at runtime. Trying to keep running in the presence of bugs is in
-general a losing battle:
+In principle, defensive programming as defined above is a good idea.
+As defensive programming is commonly practiced, though, “unforeseen
+circumstances” usually mean the discovery of a bug at runtime. Trying
+to keep running in the presence of bugs is in general a losing battle:
 
 - Code is littered with checks that obscure the logic of the program.
 - The code paths that attempt to recover from bugs:
@@ -392,80 +349,55 @@ ctest --output-on-failure --test-dir ../build  # test
 
 ### Configuration
 
-The behavior of this library is configured by preprocessor symbols.
+The behavior of this library is configured by one preprocessor symbol,
+`ADOBE_CONTRACT_VIOLATION`.  It can have one of three definitions, or
+be left undefined.
 
-Instead of passing many `-D` options in your compiler command-line,
-you can put the definition of these symbols in a header file and
-simply define `ADOBE_CONTRACT_CHECKS_CONFIGURATION` as the `#include`
-argument to that file:
+- `verbose`: as much information as possible is collected from the
+  site of a detected contract violation and reported to the standard
+  error stream before `std::terminate()` is invoked.  This behavior is
+  also the default if `ADOBE_CONTRACT_VIOLATION` is left undefined.
 
-```sh
-c++ -D \
-    -I .\
-    ADOBE_CONTRACT_CHECKS_CONFIGURATION="<myproject/adobe_contract_checks_config.hpp>" \
-    myproject_source.cpp -o myproject_executable
-```
+- `minimal`: When a contract violation is detected, `std::terminate()`
+  is invoked immediately.  Aside from code to check the condition and
+  call `terminate`, none of the arguments to a contract checking macro
+  generates any code or data.
 
-If you are using this project via CMake, defining the same symbol in
-your `CMakeLists.txt` or on the command line will cause all clients of this
-library in your build to use that configuration file.
+- `unsafe`: Contract checking macros have no effect and generate no
+  code or data.  Not recommended for general use, but can be useful
+  for measuring the overall performance impact of checking in a
+  program.
 
 This library can only have one configuration in an executable, so the
-privilege of configuring it belongs to the executable.  In CMake,
+privilege of choosing a configuration for all components always
+belongs to the top-level project in a build.
+
+To avoid ODR violations, any binary libraries (not built from source)
+that use this library must use the same version of this library, and
+if they use this library in public header files, must have been built
+with the same value of `ADOBE_CONTRACT_VIOLATION`.
+
+In CMake you could use a pattern like this:
 
 ```cmake
 if(PROJECT_IS_TOP_LEVEL)
-  set(ADOBE_CONTRACT_CHECKS_CONFIGURATION "<myproject/adobe_contract_checks_config.hpp>")
+  # Set adobe-contract-checks configuration default based on build
+  # type.
+  if(CMAKE_BUILD_TYPE EQUALS "Debug")
+    set(default_ADOBE_CONTRACT_VIOLATION "verbose")
+  else()
+    set(default_ADOBE_CONTRACT_VIOLATION "minimal")
+  endif()
+  # declare the option so user can configure on CMake command-line or
+  # in CMakeCache.txt.
+  option(ADOBE_CONTRACT_VIOLATION
+    "Behavior when a contract violation is detected"
+    "${default_ADOBE_CONTRACT_VIOLATION}")
+endif()
+
+# add the preprocessor definition to the C++ compiler command line for
+# all targets.
+if(DEFINED ADOBE_CONTRACT_VIOLATION)
+  add_compile_definitions("ADOBE_CONTRACT_VIOLATION=${ADOBE_CONTRACT_VIOLATION}")
 endif()
 ```
-
-#### Preprocessor configuration symbols
-
-##### Contract violation handler definition
-
-- `ADOBE_CONTRACT_VIOLATED_THROWS`: define this symbol if your
-  contract violation handler, against our advice (see [recommendation
-  1](#recommendations)), can throw exceptions.
-
-##### Symbols that minimize generated code and data
-
-- `ADOBE_SKIP_NONCRITICAL_PRECONDITION_CHECKS`: define this symbol to
-  make uses of `ADOBE_NONCRITICAL_PRECONDITION` generate no code.  Be
-  sure you use `ADOBE_NONCRITICAL_PRECONDITION` according to its
-  documentation.
-
-- `ADOBE_SKIP_ALL_CONTRACT_CHECKS`: define this symbol to make all
-  contract checking macros generate no code.  Not recommended for
-  general use, but can be useful for measuring the overall performance
-  impact of checking in a program.
-
-The following symbols change the behavior of the contract checking
-macros so that they generate lighter-weight (and less informative)
-calls to the violation handler.  For example, if you put expensive
-string construction expressions in the second arguments to these
-macros, but define `ADOBE_NO_CONTRACT_MESSAGE_STRINGS`, those
-expressions will never be evaluated.
-
-- `ADOBE_NO_CONTRACT_CONDITION_STRINGS`: define this symbol to
-  suppress the generation of strings describing failed check
-  conditions.  The empty string will be used instead.
-
-- `ADOBE_NO_CONTRACT_MESSAGE_STRINGS`: define this symbol to suppress
-  the expansion of `message` arguments to checking macros.
-
-- `ADOBE_NO_CONTRACT_FILENAME_STRINGS`: define this symbol to suppress
-  the generation of strings describing the file in which failed checks
-  occurred.  `"<unknown file>"` will be used instead.
-
-------------------
-
-[![ci](https://github.com/stlab/adobe-contract-checks/actions/workflows/ci.yml/badge.svg)](https://github.com/stlab/adobe-contract-checks/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/stlab/adobe-contract-checks/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/stlab/adobe-contract-checks/actions/workflows/codeql-analysis.yml)
-
-
-## More Details
-
- * [Dependency Setup](README_dependencies.md)
- * [Building Details](README_building.md)
- * [Troubleshooting](README_troubleshooting.md)
- * [Docker](README_docker.md)
