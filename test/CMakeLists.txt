@@ -96,29 +96,21 @@ target_compile_definitions(unsafe_configuration_tests PRIVATE
 
 adobe_contract_checking_add_test(inadequate_arity_checking_tests)
 
-icm_add_build_failure_test(
-    NAME misconfiguration
-    TARGET misconfiguration-test
-    SOURCES PARSE misconfiguration_test.cpp
+# Adds a test of this library, with executable target "${base_name}_test"
+# to be built from "${base_name}_test.cpp", that passes only if the
+# executable fails to build.  Uses icm_add_build_failure_test, which
+# see, with the source file passed via `SOURCES PARSE`.
+function(adobe_contract_checking_add_build_failure_test base_name)
+  icm_add_build_failure_test(
+    NAME "${base_name}"
+    TARGET "${base_name}_test"
+    SOURCES PARSE "${base_name}_test.cpp"
     FOLDER test # MSVC solution folder
-)
-adobe_contract_checking_apply_standard_options(misconfiguration-test)
-target_link_libraries(misconfiguration-test PRIVATE adobe-contract-checking)
+  )
+  adobe_contract_checking_apply_standard_options("${base_name}_test")
+  target_link_libraries("${base_name}_test" PRIVATE adobe-contract-checking)
+endfunction()
 
-icm_add_build_failure_test(
-    NAME too-few-arguments
-    TARGET too-few-arguments-test
-    SOURCES PARSE too_few_arguments_test.cpp
-    FOLDER test # MSVC solution folder
-)
-adobe_contract_checking_apply_standard_options(too-few-arguments-test)
-target_link_libraries(too-few-arguments-test PRIVATE adobe-contract-checking)
-
-icm_add_build_failure_test(
-    NAME too-many-arguments
-    TARGET too-many-arguments-test
-    SOURCES PARSE too_many_arguments_test.cpp
-    FOLDER test # MSVC solution folder
-)
-adobe_contract_checking_apply_standard_options(too-many-arguments-test)
-target_link_libraries(too-many-arguments-test PRIVATE adobe-contract-checking)
+adobe_contract_checking_add_build_failure_test(misconfiguration)
+adobe_contract_checking_add_build_failure_test(too_few_arguments)
+adobe_contract_checking_add_build_failure_test(too_many_arguments)
