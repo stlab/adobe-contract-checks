@@ -1,5 +1,6 @@
 #include "adobe/contract_checks.hpp"
 #include "portable_death_tests.hpp"
+#include <gmock/gmock-matchers.h>
 #include <gtest/gtest.h>
 
 // ****** Death tests should precede non-death tests. *********
@@ -8,13 +9,21 @@
 // emscripten, the test sometimes fails even if the executable aborts.
 // https://gitlab.kitware.com/cmake/cmake/-/issues/26218
 
+using ::testing::HasSubstr;
+using ::testing::Not;
+
 TEST(MinimalConfigurationDeathTests, FailedChecksDie)
 {
-  EXPECT_PORTABLE_DEATH(ADOBE_PRECONDITION(false), "");
-  EXPECT_PORTABLE_DEATH(ADOBE_INVARIANT(false), "");
+  const bool uNlIKeLyIdEnTiFiEr = false;
 
-  EXPECT_PORTABLE_DEATH(ADOBE_PRECONDITION(false, "#~#"), "");
-  EXPECT_PORTABLE_DEATH(ADOBE_INVARIANT(false, "#~#"), "");
+  EXPECT_PORTABLE_DEATH(
+    ADOBE_PRECONDITION(uNlIKeLyIdEnTiFiEr), Not(HasSubstr("uNlIKeLyIdEnTiFiEr")));
+  EXPECT_PORTABLE_DEATH(ADOBE_INVARIANT(uNlIKeLyIdEnTiFiEr), Not(HasSubstr("uNlIKeLyIdEnTiFiEr")));
+
+  EXPECT_PORTABLE_DEATH(
+    ADOBE_PRECONDITION(false, "~uNlIKeLyIdEnTiFiEr~"), Not(HasSubstr("~uNlIKeLyIdEnTiFiEr~")));
+  EXPECT_PORTABLE_DEATH(
+    ADOBE_INVARIANT(false, "~uNlIKeLyIdEnTiFiEr~"), Not(HasSubstr("~uNlIKeLyIdEnTiFiEr~")));
 }
 
 TEST(MinimalConfiguration, ContractNonViolationsDoNotCauseAbort)
