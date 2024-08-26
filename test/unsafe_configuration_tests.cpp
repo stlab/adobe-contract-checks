@@ -20,5 +20,5 @@ TEST(UnsafeConfiguration, AllChecksAreNoOps)
 // For unknown reasons if the last test is a death test, under
 // emscripten, the test fails even if the executable aborts.
 #if defined(__EMSCRIPTEN__)
-TEST(MinimalConfiguration, EmscriptenDummy) {}
+TEST(LightweightConfiguration, EmscriptenDummy) {}
 #endif

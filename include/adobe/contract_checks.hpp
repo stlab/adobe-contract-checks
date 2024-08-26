@@ -2,7 +2,7 @@
 #define ADOBE_CONTRACT_CHECKS_HPP
 
 #define INTERNAL_ADOBE_CONTRACT_VIOLATION_verbose 1
-#define INTERNAL_ADOBE_CONTRACT_VIOLATION_minimal 2
+#define INTERNAL_ADOBE_CONTRACT_VIOLATION_lightweight 2
 #define INTERNAL_ADOBE_CONTRACT_VIOLATION_unsafe 3
 
 // INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR is not a function-style
@@ -77,7 +77,7 @@ namespace detail {
 }// namespace detail
 }// namespace adobe
 
-#elif INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR == INTERNAL_ADOBE_CONTRACT_VIOLATION_minimal
+#elif INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR == INTERNAL_ADOBE_CONTRACT_VIOLATION_lightweight
 
 #define INTERNAL_ADOBE_CONTRACT_VIOLATED(condition, kind, file, line, message) ::std::terminate()
 
@@ -88,7 +88,7 @@ namespace detail {
 #define ADOBE_INTERNAL_STRINGIFY(x) ADOBE_INTERNAL_STRINGIFY1(x)
 static_assert(false,
   "Unknown configuration ADOBE_CONTRACT_VIOLATION=" ADOBE_INTERNAL_STRINGIFY(
-    ADOBE_CONTRACT_VIOLATION) ".  Valid values are \"verbose\", \"minimal\", or \"unsafe\"");
+    ADOBE_CONTRACT_VIOLATION) ".  Valid values are \"verbose\", \"lightweight\", or \"unsafe\"");
 #endif
 
 #if INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR != INTERNAL_ADOBE_CONTRACT_VIOLATION_unsafe

@@ -202,7 +202,7 @@ strings, or be left undefined.
   invoked.  This behavior is also the default if
   `ADOBE_CONTRACT_VIOLATION` is left undefined.
 
-- `ADOBE_CONTRACT_VIOLATION=minimal`: When a contract violation is
+- `ADOBE_CONTRACT_VIOLATION=lightweight`: When a contract violation is
   detected, `std::terminate()` is invoked immediately.  Aside from
   code to check the condition and call `terminate`, none of the
   arguments to a contract checking macro generates any code or data.
@@ -242,7 +242,7 @@ if(PROJECT_IS_TOP_LEVEL)
   if(CMAKE_BUILD_TYPE EQUALS "Debug")
     set(default_ADOBE_CONTRACT_VIOLATION "verbose")
   else()
-    set(default_ADOBE_CONTRACT_VIOLATION "minimal")
+    set(default_ADOBE_CONTRACT_VIOLATION "lightweight")
   endif()
   # declare the option so user can configure on CMake command-line or
   # in CMakeCache.txt.
