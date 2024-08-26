@@ -23,6 +23,7 @@ endif()
 
 # ---- Dependencies ----
 
+include(icm_build_failure_testing)
 include(GoogleTest)
 
 # Adds a test called verify_<base_name> with test executable target
@@ -79,6 +80,8 @@ function(handle_emscripten_death_tests test_executable)
   )
 endfunction()
 
+adobe_contract_checking_add_test(default_configuration_tests verbose_configuration_tests.cpp)
+
 adobe_contract_checking_add_test(verbose_configuration_tests)
 target_compile_definitions(verbose_configuration_tests PRIVATE
   "ADOBE_CONTRACT_VIOLATION=verbose")
@@ -90,3 +93,32 @@ target_compile_definitions(lightweight_configuration_tests PRIVATE
 adobe_contract_checking_add_test(unsafe_configuration_tests)
 target_compile_definitions(unsafe_configuration_tests PRIVATE
   "ADOBE_CONTRACT_VIOLATION=unsafe")
+
+adobe_contract_checking_add_test(inadequate_arity_checking_tests)
+
+icm_add_build_failure_test(
+    NAME misconfiguration
+    TARGET misconfiguration-test
+    SOURCES PARSE misconfiguration_test.cpp
+    FOLDER test # MSVC solution folder
+)
+adobe_contract_checking_apply_standard_options(misconfiguration-test)
+target_link_libraries(misconfiguration-test PRIVATE adobe-contract-checking)
+
+icm_add_build_failure_test(
+    NAME too-few-arguments
+    TARGET too-few-arguments-test
+    SOURCES PARSE too_few_arguments_test.cpp
+    FOLDER test # MSVC solution folder
+)
+adobe_contract_checking_apply_standard_options(too-few-arguments-test)
+target_link_libraries(too-few-arguments-test PRIVATE adobe-contract-checking)
+
+icm_add_build_failure_test(
+    NAME too-many-arguments
+    TARGET too-many-arguments-test
+    SOURCES PARSE too_many_arguments_test.cpp
+    FOLDER test # MSVC solution folder
+)
+adobe_contract_checking_apply_standard_options(too-many-arguments-test)
+target_link_libraries(too-many-arguments-test PRIVATE adobe-contract-checking)

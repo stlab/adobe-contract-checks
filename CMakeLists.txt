@@ -30,7 +30,6 @@ adobe_contract_checking_setup_options()
 
 adobe_contract_checking_global_options()
 include(Dependencies.cmake)
-adobe_contract_checking_setup_dependencies()
 
 adobe_contract_checking_local_options()
 
