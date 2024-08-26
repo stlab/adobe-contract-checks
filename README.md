@@ -95,6 +95,7 @@ error in the function's signature. Documenting *which* exceptions can be
 thrown or errors reported is not crucial, but documenting the fact
 *that* an error can occur is.
 
+<a id="reported-errors-and-class-invariants"/>
 Unless otherwise specified in the function's documentation, a reported
 error means all objects the function would otherwise modify are
 invalid for all uses, except as the target of destruction or
@@ -323,6 +324,33 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
   `protected` access and derived class `check_invariant()`
   implementations should call the `check_invariant()`(s) of their
   parent classes.
+
+  If your mutating function has multiple returns, it might be useful
+  to wrap your `check_invariant()` call in
+  [`boost::scope_success`](https://www.boost.org/doc/libs/master/libs/scope/doc/html/scope/scope_guards.html#scope.scope_guards.conditional)
+  (which also [may be
+  available](https://en.cppreference.com/w/cpp/experimental/scope_success)
+  in your implementation's `std::experimental` namespace), at the beginning
+  of the function.
+
+  ```c++
+  void mutate_me() {
+    std::experimental::scope_success _([&]{ check_invariant(); });
+    ...
+  }
+  ```
+
+  **Caveats:**
+
+  1. You still need to call `check_invariant()` anywhere the object
+     under mutation may exposed outside the class other than by
+     returning, e.g. if it is passed to a callback function.
+
+  2. If your function reports errors to the caller other than by
+     exception (e.g. in the return value), this technique will force
+     your invariant to be checked even in the event of an error, which
+     is [inappropriate](#reported-errors-and-class-invariants), and
+     may force you to weaken the invariant.
 
 - If your program needs to take emergency shutdown measures before
   termination, put those in a [terminate
