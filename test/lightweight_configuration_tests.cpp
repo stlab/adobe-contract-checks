@@ -12,7 +12,7 @@
 using ::testing::HasSubstr;
 using ::testing::Not;
 
-TEST(LightweightConfigurationDeathTests, FailedChecksDie)
+TEST(LightweightConfigurationDeathTest, FailedChecksDie)
 {
   const bool uNlIKeLyIdEnTiFiEr = false;
 
