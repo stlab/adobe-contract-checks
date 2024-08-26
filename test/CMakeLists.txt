@@ -77,9 +77,9 @@ adobe_contract_checking_add_test(verbose_configuration_tests)
 target_compile_definitions(verbose_configuration_tests PRIVATE
   "ADOBE_CONTRACT_VIOLATION=verbose")
 
-adobe_contract_checking_add_test(minimal_configuration_tests)
-target_compile_definitions(minimal_configuration_tests PRIVATE
-  "ADOBE_CONTRACT_VIOLATION=minimal")
+adobe_contract_checking_add_test(lightweight_configuration_tests)
+target_compile_definitions(lightweight_configuration_tests PRIVATE
+  "ADOBE_CONTRACT_VIOLATION=lightweight")
 
 adobe_contract_checking_add_test(unsafe_configuration_tests)
 target_compile_definitions(unsafe_configuration_tests PRIVATE

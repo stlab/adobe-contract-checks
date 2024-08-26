@@ -12,7 +12,7 @@
 using ::testing::HasSubstr;
 using ::testing::Not;
 
-TEST(MinimalConfigurationDeathTests, FailedChecksDie)
+TEST(LightweightConfigurationDeathTests, FailedChecksDie)
 {
   const bool uNlIKeLyIdEnTiFiEr = false;
 
@@ -26,7 +26,7 @@ TEST(MinimalConfigurationDeathTests, FailedChecksDie)
     ADOBE_INVARIANT(false, "~uNlIKeLyIdEnTiFiEr~"), Not(HasSubstr("~uNlIKeLyIdEnTiFiEr~")));
 }
 
-TEST(MinimalConfiguration, ContractNonViolationsDoNotCauseAbort)
+TEST(LightweightConfiguration, ContractNonViolationsDoNotCauseAbort)
 {
   ADOBE_PRECONDITION(true);
   ADOBE_INVARIANT(true);
@@ -36,5 +36,5 @@ TEST(MinimalConfiguration, ContractNonViolationsDoNotCauseAbort)
 }
 
 #if defined(__EMSCRIPTEN__) && 0
-TEST(MinimalConfiguration, EmscriptenDummy) {}
+TEST(LightweightConfiguration, EmscriptenDummy) {}
 #endif
