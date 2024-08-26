@@ -96,8 +96,30 @@ thrown or errors reported is not crucial, but documenting the fact
 *that* an error can occur is.
 
 Unless otherwise specified in the function's documentation, a reported
-error means all objets the function would otherwise modify are invalid
-for all uses except as the target of destruction or assignment.
+error means all objects the function would otherwise modify are
+invalid for all uses, except as the target of destruction or
+assignment.  It is the obligation of the code that handles the error
+(i.e. stops its propagation to callers) to discard the invalid data.
+Thus, in case an error reported, **class invariants need not be
+upheld**; the only properties of the class that must be maintained are
+destructibility and assignability.  Note that this policy is less
+strict than the [basic exception safety
+guarantee](https://en.wikipedia.org/wiki/Exception_safety#Classification).
+
+Upholding the obligation to discard invalid mutated data is reasonably
+easy if types under mutation have [value
+semantics](https://www.jot.fm/issues/issue_2022_02/article2.pdf),
+because data forms a tree and the invalidated data is always uniquely
+a part of the objects being mutated at the level of the error-handling
+code.  Otherwise it may be necessary to discard other parts of the
+object graph.
+
+The usual, and most useful, way of specifying that data under mutation
+is *not* invalidated is by making the [strong
+guarantee](https://en.wikipedia.org/wiki/Exception_safety#Classification)
+that there are no effects in case of an error.  When the callee can
+make that promise without loss of efficiency, it exempts the caller
+from discarding invalid data.
 
 ## Basic C++ Usage
 
@@ -294,9 +316,9 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
 - Give your `struct` or `class` a `void check_invariant() const`
   method containing `ADOBE_INVARIANT` invocations, so that invariant
   checking can be centralized.  Invoke it from each public mutating
-  friend or member function just before each `return` or before
-  `*this` becomes visible to any other component such as a callback
-  parameter.
+  friend or member function or constructor just before each `return`
+  or before `*this` becomes visible to any other component such as a
+  callback parameter... except in the case where an error is reported.
 
 - If your program needs to take emergency shutdown measures before
    termination, put those in a [terminate
