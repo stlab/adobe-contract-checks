@@ -270,41 +270,41 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
 
 ## Recommendations
 
--  Start by checking whatever you can, and worry about performance
-   later. Checks are often critical for safety. [Configuration
-   options](#configuration) can be used to mitigate or eliminate costs
-   later if necessary.
+- Start by checking whatever you can, and worry about performance
+  later. Checks are often critical for safety. [Configuration
+  options](#configuration) can be used to mitigate or eliminate costs
+  later if necessary.
 
--  If you have to prioritize, precondition checks are the most
-   important; they are your last line of defense against undefined
-   behavior.
+- If you have to prioritize, precondition checks are the most
+  important; they are your last line of defense against undefined
+  behavior.
 
-   Class invariant checks can often give you more bang for your buck,
-   though, because they can be used to eliminate the need for
-   precondition checks and verbose documentation across many
-   functions.
+  Class invariant checks can often give you more bang for your buck,
+  though, because they can be used to eliminate the need for
+  precondition checks and verbose documentation across many
+  functions.
 
-   ```c++
-   // Returns the day of the week corresponding to the date described
-   // by "<year>-<month>-<day>" (interpreted in ISO standard date
-   // format).
-   //
-   // Precondition: "<year>-<month>-<day>" is a valid ISO standard date.
-   day_of_the_week day(int year, int month, int day) {
-     ADOBE_PRECONDITION(is_valid_date(year, month, day));
-     // implementation starts here.
-   }
+  ```c++
+  // Returns the day of the week corresponding to the date described
+  // by "<year>-<month>-<day>" (interpreted in ISO standard date
+  // format).
+  //
+  // Precondition: "<year>-<month>-<day>" is a valid ISO standard date.
+  day_of_the_week day(int year, int month, int day) {
+    ADOBE_PRECONDITION(is_valid_date(year, month, day));
+    // implementation starts here.
+  }
 
-   // ------- vs -------
+  // ------- vs -------
 
-   // Returns the day of the week corresponding to `d`.
-   day_of_the_week day(date d) {
-     // implementation starts here.
-   }
-   ```
+  // Returns the day of the week corresponding to `d`.
+  day_of_the_week day(date d) {
+    // implementation starts here.
+  }
+  ```
 
-   The second function above benefits by accepting a `date` type whose
-   invariant ensures its validity.
+  The second function above benefits by accepting a `date` type whose
+  invariant ensures its validity.
 
 - The conditions in your checks should not have side-effects that
   change program behavior; readers expect to be able to skip over
@@ -325,33 +325,33 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
   parent classes.
 
 - If your program needs to take emergency shutdown measures before
-   termination, put those in a [terminate
-   handler](https://en.cppreference.com/w/cpp/error/terminate_handler)
-   that eventually calls
-   [`std::abort()`](https://en.cppreference.com/w/cpp/utility/program/abort).
+  termination, put those in a [terminate
+  handler](https://en.cppreference.com/w/cpp/error/terminate_handler)
+  that eventually calls
+  [`std::abort()`](https://en.cppreference.com/w/cpp/utility/program/abort).
 
-     ```c++
-     #include <cstdlib>
-     #include <exception>
+    ```c++
+    #include <cstdlib>
+    #include <exception>
 
-     [[noreturn]] void emergency_shutdown() noexcept;
+    [[noreturn]] void emergency_shutdown() noexcept;
 
-     const std::terminate_handler previous_terminate_handler
-       = std::set_terminate(emergency_shutdown);
+    const std::terminate_handler previous_terminate_handler
+      = std::set_terminate(emergency_shutdown);
 
-     [[noreturn]] void emergency_shutdown() noexcept
-     {
-       // emergency shutdown measures here.
+    [[noreturn]] void emergency_shutdown() noexcept
+    {
+      // emergency shutdown measures here.
 
-       if (previous_terminate_handler != nullptr)
-         { previous_terminate_handler(); }
-       std::abort();
-     }
-     ...
-     ```
+      if (previous_terminate_handler != nullptr)
+        { previous_terminate_handler(); }
+      std::abort();
+    }
+    ...
+    ```
 
-   That way, other reasons for sudden termination, such as
-   uncaught exceptions, will still cause emergency shutdown to execute.
+  That way, other reasons for sudden termination, such as
+  uncaught exceptions, will still cause emergency shutdown to execute.
 
 - Don't disable critical checks in shipping code unless a measurable
   unacceptable performance cost is found, and after assessing the risk
