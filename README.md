@@ -423,7 +423,7 @@ The usual procedures for development with CMake apply.  One typical
 set of commands might be:
 
 ```sh
-cmake -Wno-dev -S . -B ../build -GNinja        # configure
+cmake -DBUILD_TESTING -Wno-dev -S . -B ../build -GNinja        # configure
 cmake --build ../build                         # build/rebuild after changes
 ctest --output-on-failure --test-dir ../build  # test
 ```
