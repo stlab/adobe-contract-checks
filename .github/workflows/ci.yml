@@ -100,7 +100,7 @@ jobs:
 
       - name: Configure
         run: |
-          ${{ matrix.cmake-launcher }} cmake -Wno-dev -S . -B ./build -GNinja ${{env.compiler}} -DCMAKE_BUILD_TYPE=${{matrix.cmake_build_type}} -DCMAKE_CXX_STANDARD=17
+          ${{ matrix.cmake-launcher }} cmake -Wno-dev -S . -B ./build -GNinja ${{env.compiler}} -DCMAKE_BUILD_TYPE=${{matrix.cmake_build_type}} -DCMAKE_CXX_STANDARD=17 -DBUILD_TESTING=ON
 
       - name: Build
         run: |
