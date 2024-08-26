@@ -25,15 +25,21 @@ endif()
 
 include(GoogleTest)
 
-# Adds a test called verify_<base_name>, built from <base_name>.cpp
-# with test executable target named <base_name>, that passes iff it
-# exits as expected and outputs a string matching the regular
-# expression <expected_output_re>.  Additional arguments are
-# interpreted as source files.
+# Adds a test called verify_<base_name> with test executable target
+# named <base_name>, that passes iff it exits as expected and outputs
+# a string matching the regular expression <expected_output_re>. The
+# test source file list is given as additional arguments, or defaults
+# to "${base_name}.cpp".
 function(adobe_contract_checking_add_test base_name)
+  if(ARGN)
+    set(sources ${ARGN})
+  else()
+    set(sources "${base_name}.cpp")
+  endif()
+
   add_executable("${base_name}"
-    "${base_name}.cpp"
-    win32_abort_detection.cpp no_external_linkage_assurance.cpp ${ARGN})
+    ${sources}
+    win32_abort_detection.cpp no_external_linkage_assurance.cpp)
   adobe_contract_checking_apply_standard_options("${base_name}")
   target_link_libraries(
     "${base_name}"
