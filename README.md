@@ -319,6 +319,10 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
   friend or member function or constructor just before each `return`
   or before `*this` becomes visible to any other component such as a
   callback parameter... except in the case where an error is reported.
+  Base classes should define their `check_invariant()` with
+  `protected` access and derived class `check_invariant()`
+  implementations should call the `check_invariant()`(s) of their
+  parent classes.
 
 - If your program needs to take emergency shutdown measures before
    termination, put those in a [terminate
