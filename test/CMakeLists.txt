@@ -39,7 +39,7 @@ function(adobe_contract_checking_add_test base_name)
     "${base_name}"
     PRIVATE
     adobe-contract-checking
-    GTest::gtest_main)
+    GTest::gtest_main gmock)
   gtest_discover_tests("${base_name}")
   if(EMSCRIPTEN)
     handle_emscripten_death_tests("${base_name}")
