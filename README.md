@@ -45,25 +45,39 @@ terminated ([rationale](#about-defensive-programming)).
 
 ### Documenting Contracts
 
-A function's specification must at least describe its preconditions
-and postconditions. The specification of a class must describe its
-publicly-visible invariants.  The minimal documentation required for
-any component is its contract, and usually, a short sentence fragment
-is sufficient to convey all the important information.
+**The minimal documentation required for any component is its contract**. 
+Writing this documentation need not be a burden; usually, a short sentence
+fragment is sufficient ([examples](#basic-c-usage)).
+- The contract of a function describes its preconditions, postconditions
+  (which include the return value). 
+- The contract of a class describes its publicly-visible invariants.
 
-Additionally describing these conditions in code and checking them at
-runtime can be  a powerful way to catch bugs early and prevent their
-damaging effects.
+**Documentation is the primary vehicle for expressing
+contracts**
 
-That said, documentation is the primary vehicle for expressing
-contracts for two reasons:
+<details>
+<summary markdown='span'><em>Rationale</em></summary>
 
-1. Some contracts cannot be checked at runtime, e.g. “`p` points to a
-   valid object,” or “the `callback` parameter always returns a value
-   from `0` through `1.0`.”
+1. Some contracts cannot be checked at runtime.  For example, there's no
+   way to check these preconditions:
+   ```c++
+   /// Returns the frobnication of `p` and `f`.
+   ///
+   /// - Precondition: `p` points to an initialized object.
+   /// - Precondition: `f(x)` returns a value from `0` through `1.0`
+   ///   for any `x`.”
+   auto g(X* p, float (*f)(int)) -> bool;
+   ```
 2. Reasoning locally about code depends on being able to understand
    the contract of each component the code uses without looking at the
-   component's implementation.
+   component's implementation.  From a client's point of view, contract
+   checks are hidden inside the implementation.
+
+</details>
+
+Additionally describing contracts in code and checking them at
+runtime can be  a powerful way to catch bugs early and prevent their
+damaging effects, thus this library.
 
 #### How Reported Errors Fit In
 
