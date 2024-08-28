@@ -66,7 +66,7 @@ contracts**
    /// - Precondition: `p` points to an initialized object.
    /// - Precondition: `f(x)` returns a value from `0` through `1.0`
    ///   for any `x`.”
-   auto g(X* p, float (*f)(int)) -> bool;
+   auto frob(X* p, float (*f)(int)) -> bool;
    ```
 2. Reasoning locally about code depends on being able to understand
    the contract of each component the code uses without looking at the
@@ -93,9 +93,9 @@ allowed postcondition failure.
 For example:
 
 ```c++
-// Returns a pointer to a colorful widget.
-//
-// Throws std::bad_alloc if memory is exhausted.
+/// Returns a pointer to a colorful widget.
+///
+/// Throws std::bad_alloc if memory is exhausted.
 std::unique_ptr<Widget> build_widget();
 ```
 
@@ -163,36 +163,36 @@ For example,
 #include <adobe/contract_checks.hpp>
 #include <climits>
 
-// A half-open range of integers.
-// - Invariant: start() <= end().
+/// A half-open range of integers.
+/// - Invariant: start() <= end().
 class int_range {
-  // The lower bound; if the range is non-empty, its
-  // least contained value.
+  /// The lower bound; if `*this` is non-empty, its
+  /// least contained value.
   int _start;
-  // The upper bound; if the range is non-empty, one
-  // greater than its greatest contained value.
+  /// The upper bound; if `*this` is non-empty, one
+  /// greater than its greatest contained value.
   int _end;
 
-  // Returns true if and only if the invariants are intact.
+  /// Returns `true` if and only if the invariants are intact.
   bool is_valid() const { return start() <= end(); }
 public:
-  // An instance with the given bounds.
-  // - Precondition: end >= start
+  /// An instance with the given bounds.
+  /// - Precondition: `end >= start`.
   int_range(int start, int end) : _start(start), _end(end) {
     ADOBE_PRECONDITION(end >= start, "invalid range bounds.");
     ADOBE_INVARIANT(is_valid());
   }
 
-  // Returns the lower bound: if *this is non-empty, its
-  // least contained value.
+  /// Returns the lower bound: if `*this` is non-empty, its
+  /// least contained value.
   int start() const { return _start; }
 
-  // Returns the upper bound; if *this is non-empty, one
-  // greater than its greatest contained value.
+  /// Returns the upper bound; if `*this` is non-empty, one
+  /// greater than its greatest contained value.
   int end() const { return _end; }
 
-  // Increases the upper bound by 1.
-  // Precondition: end() < INT_MAX
+  /// Increases the upper bound by 1.
+  /// - Precondition: `end() < INT_MAX`.
   void grow_rightward() {
     ADOBE_PRECONDITION(end() < INT_MAX);
     int old_end = end();
@@ -200,7 +200,7 @@ public:
     ADOBE_INVARIANT(is_valid());
   }
 
-  // more methods...
+  /// more methods...
 };
 ```
 
