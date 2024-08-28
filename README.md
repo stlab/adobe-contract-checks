@@ -173,14 +173,14 @@ class int_range {
   // greater than its greatest contained value.
   int _end;
 
-  // Fails a contract check if the invariants of `*self` are violated.
-  void check_invariant() const { ADOBE_INVARIANT(start() <= end()); }
+  // Returns true if and only if the invariants are intact.
+  bool is_valid() const { return start() <= end(); }
 public:
   // An instance with the given bounds.
-  // Precondition: end >= start
+  // - Precondition: end >= start
   int_range(int start, int end) : _start(start), _end(end) {
     ADOBE_PRECONDITION(end >= start, "invalid range bounds.");
-    check_invariant();
+    ADOBE_INVARIANT(is_valid());
   }
 
   // Returns the lower bound: if *this is non-empty, its
@@ -197,7 +197,7 @@ public:
     ADOBE_PRECONDITION(end() < INT_MAX);
     int old_end = end();
     _end += 1;
-    check_invariant();
+    ADOBE_INVARIANT(is_valid());
   }
 
   // more methods...
@@ -327,16 +327,24 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
 - Group all precondition checks immediately after a function's
   opening brace, and don't allow any code to sneak in before them.
 
-- Give your `struct` or `class` a `void check_invariant() const`
-  method containing `ADOBE_INVARIANT` invocations, so that invariant
-  checking can be centralized.  Invoke it from each public mutating
-  friend or member function or constructor just before each `return`
-  or before `*this` becomes visible to any other component such as a
-  callback parameter... except in the case where an error is reported.
-  Base classes should define their `check_invariant()` with
-  `protected` access and derived class `check_invariant()`
-  implementations should call the `check_invariant()`(s) of their
-  parent classes.
+- Give your `struct` or `class` a `bool is_valid() const` method that
+  returns `true` if and only if invariants are intact, so that
+  invariant condition checking can be centralized.  Invoke
+  `ADOBE_INVARIANT(is_valid())` from each public mutating friend or
+  member function or constructor just before each `return`, or before
+  `*this` becomes visible to any other component such as a callback
+  parameter... except in the case where an error is reported
+  ([rationale](#how-reported-errors-fit-in)).
+
+  Base classes should define a `protected` `virtual` `is_valid()`
+  member. Derived class overrides should begin by checking
+  `is_valid()`(s) of their base classes.
+
+  ```c++
+      bool is_valid() const override {
+        return base::is_valid() && some_derived_class_invariant();
+      }
+  ```
 
 - If your program needs to take emergency shutdown measures before
   termination, put those in a [terminate
