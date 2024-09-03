@@ -400,6 +400,31 @@ testing. Also postcondition checks for most mutating functions need to
 makes an initial copy of everything being mutated, which can be
 prohibitively expensive even for debug builds.
 
+### Why This Library Does Not Throw Exceptions
+
+When [Design by
+Contract](https://en.wikipedia.org/wiki/Design_by_contract) was first
+implemented in a language, a contract violation would cause an
+exception to be thrown.  On the surface, that might seem at first like
+a good response to bug detection, but there are several problems:
+
+- It's important that some functions, such as those used in
+  destructors, `catch` blocks, or `noexcept` functions, never throw
+  exceptions. Contract checking is useful everywhere.
+- Exceptions cause stack unwinding, which destroys information that
+  otherwise could be vital to finding the cause of a bug.
+- Exceptions are for conditions where the program can, after taking
+  some recovery action, return to normal execution. If there's no path
+  back to normal execution, we might as well terminate the program
+  (possibly after taking emergency measures). But when a bug is
+  discovered, the potential damage to program state is arbitrary, and
+  there is no known recovery action.  Also see the section on
+  [defensive programming](#about-defensive-programming) below.
+
+If your function really needs to throw an exception, that should be a
+documented part of its contract, so that response can be tested for
+and callers can respond appropriately.
+
 ### About Defensive Programming
 
 According to
