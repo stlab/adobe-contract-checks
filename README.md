@@ -423,7 +423,8 @@ a good response to bug detection, but there are several problems:
 
 If your function really needs to throw an exception, that should be a
 documented part of its contract, so that response can be tested for
-and callers can respond appropriately.
+and callers can respond appropriately.  See [How Reported Errors Fit
+In](#how-reported-errors-fit-in) for more information.
 
 ### About Defensive Programming
 
