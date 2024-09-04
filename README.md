@@ -287,7 +287,9 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
 - Start by checking whatever you can, and worry about performance
   later. Checks are often critical for safety. [Configuration
   options](#configuration) can be used to mitigate or eliminate costs
-  later if necessary.
+  later if necessary. That said, **do not add checks that change
+  algorithmic complexity**.  Turning an O(1) operation into an O(n)
+  operation is not acceptable.
 
 - If you have to prioritize, precondition checks are the most
   important; they are your last line of defense against undefined
