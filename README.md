@@ -404,9 +404,10 @@ prohibitively expensive even for debug builds.
 
 ### Why This Library Does Not Throw Exceptions
 
-When [Design by
-Contract](https://en.wikipedia.org/wiki/Design_by_contract) was first
-implemented in a language, a contract violation would cause an
+In the original [Eiffel](https://en.wikipedia.org/wiki/Eiffel_(programming_language))
+programming language implementation of [Design by
+Contract](https://en.wikipedia.org/wiki/Design_by_contract), a contract
+violation would cause an
 exception to be thrown.  On the surface, that might seem at first like
 a good response to bug detection, but there are several problems:
 
