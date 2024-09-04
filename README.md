@@ -30,11 +30,12 @@ guarantees of any software component.  It is based on three concepts:
   violated.  Otherwise, a postcondition violation indicates
   a bug in the callee.
 
-- **Invariants**: conditions that always hold at some point in the
+- **Invariants**: conditions that always hold at one or more specific
+  points in the
   code.  The most common kind of invariants are **class invariants**,
-  which hold at any point where an instance can be inspected from
-  outside the class, but other invariant checks (especially loop
-  invariants) are also useful.
+  which hold wherever it is valid to inspect an instance from
+  outside the class, but other invariantss (especially [loop
+  invariants](https://en.wikipedia.org/wiki/Loop_invariant)) are also useful.
 
 This library provides macros for checking preconditions
 (`ADOBE_PRECONDITION`) and invariants (`ADOBE_INVARIANT`).
