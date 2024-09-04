@@ -34,7 +34,7 @@ guarantees of any software component.  It is based on three concepts:
   points in the
   code.  The most common kind of invariants are **class invariants**,
   which hold wherever it is valid to inspect an instance from
-  outside the class, but other invariantss (especially [loop
+  outside the class, but other invariants (especially [loop
   invariants](https://en.wikipedia.org/wiki/Loop_invariant)) are also useful.
 
 This library provides macros for checking preconditions
