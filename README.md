@@ -10,9 +10,14 @@ This library is for checking that software
 upheld.  In C++ these checks can be especially important for safety
 because failure to satisfy contracts typically leads to [undefined
 behavior](https://en.wikipedia.org/wiki/Undefined_behavior), which can
-manifest as crashes, data loss, and security vulnerabilities.  This
-library largely improves upon the standard
-[`assert`](https://en.cppreference.com/w/cpp/error/assert) macro.
+manifest as crashes, data loss, and security vulnerabilities.  
+
+This library 
+This library provides [macros](#basic-c-usage)  for checking preconditions and
+invariants, and can be viewed as an improvement upon the
+standard [`assert`](https://en.cppreference.com/w/cpp/error/assert)
+macro.  However, the discipline and rationales documented here are 
+just as important to the library's value as are its mechanics.
 
 ## Design by Contract
 
@@ -37,12 +42,8 @@ guarantees of any software component.  It is based on three concepts:
   outside the class, but other invariants (especially [loop
   invariants](https://en.wikipedia.org/wiki/Loop_invariant)) are also useful.
 
-This library provides macros for checking preconditions
-(`ADOBE_PRECONDITION`) and invariants (`ADOBE_INVARIANT`).
 Postconditions should be checked by unit tests
 ([rationale](#why-this-library-provides-no-postcondition-check)).
-When these precondition or invariant checks fail, the program is
-terminated ([rationale](#about-defensive-programming)).
 
 ### Documenting Contracts
 
@@ -78,7 +79,7 @@ contracts**
 
 Additionally describing contracts in code and checking them at
 runtime can be  a powerful way to catch bugs early and prevent their
-damaging effects, thus this library.
+damaging effects. That's the role of this library.
 
 ### How Reported Errors Fit In
 
@@ -89,7 +90,7 @@ function's specification: document the behavior and test it to make
 sure that it works.  Also, do not describe the error report as part of
 the postcondition. **Reporting an error to the caller exempts a
 function from fulfilling postconditions** and can be thought of as an
-allowed postcondition failure.
+unavoidable failure to fulfill postconditions.
 
 For example:
 
@@ -113,13 +114,16 @@ thrown or errors reported is not crucial, but documenting the fact
 Unless otherwise specified in the function's documentation, a reported
 error means all objects the function would otherwise modify are
 invalid for all uses, except as the target of destruction or
-assignment.  It is the obligation of the code that handles the error
-(i.e. stops its propagation to callers) to discard the invalid data.
-Thus, in case an error reported, **class invariants need not be
-upheld**; the only properties of the class that must be maintained are
+assignment.  **Discarding this invalid data is the obligation of code
+that stops error propagation to callers**.
+
+Because this invalid data must be discarded, **code that reports or
+propagates errors need not uphold class invariants**;
+the only properties of the class that must be maintained are
 destructibility and assignability.  Note that this policy is less
-strict than the [basic exception safety
-guarantee](https://en.wikipedia.org/wiki/Exception_safety#Classification).
+strict than what is implied by the [basic exception safety
+guarantee](https://en.wikipedia.org/wiki/Exception_safety#Classification),
+and supersedes the stricter policy with the endorsement of its inventor.
 
 Upholding the obligation to discard invalid mutated data is reasonably
 easy if types under mutation have [value
@@ -132,9 +136,9 @@ object graph.
 The usual, and most useful, way of specifying that data under mutation
 is *not* invalidated is by making the [strong
 guarantee](https://en.wikipedia.org/wiki/Exception_safety#Classification)
-that there are no effects in case of an error.  When the callee can
-make that promise without loss of efficiency, it exempts the caller
-from discarding invalid data.
+that there are no effects in case of an error (where possible without loss
+of efficiency).  When the callee can make that promise, it exempts the
+caller from discarding invalid data.
 
 ## Basic C++ Usage
 
@@ -147,16 +151,19 @@ This is a header-only library.  To use it from C++, simply put the
 ```
 
 The two macros used to check contracts,`ADOBE_PRECONDITION` and
-`ADOBE_INVARIANT`, eachtake one required argument and one optional
+`ADOBE_INVARIANT`, each take one required argument and one optional
 argument:
 
-- `condition` (required): an expression convertible to `bool`; if `false`, the
-  violation handler is invoked.
+- `condition` (required): an expression convertible to `bool`; if `true`,
+  the contract was upheld and the macro has no effects.
 - `message` (optional): an expression convertible to `const char*`
   pointing to a
   [null-terminated](https://en.cppreference.com/w/cpp/string/byte)
-  message that is additionally passed to the violation handler. The
+  message. The
   default `message` value is the empty string, `""`.
+
+The precise effects of a contract violation depend on this library's
+[configuration](#configuration).
 
 For example,
 
@@ -209,16 +216,15 @@ public:
 
 The behavior of this library is configured by one preprocessor symbol,
 `ADOBE_CONTRACT_VIOLATION`.  It can be defined to one of three
-strings, or be left undefined.
+strings, or be left undefined, in which case it defaults to `verbose`.
 
 - `ADOBE_CONTRACT_VIOLATION=verbose`: as much information as possible
   is collected from the site of a detected contract violation and
-  reported to the standard error stream before `std::terminate()` is
-  invoked.  This behavior is also the default if
-  `ADOBE_CONTRACT_VIOLATION` is left undefined.
-
+  reported to the standard error stream before `std::terminate()`
+  is called.
+  
 - `ADOBE_CONTRACT_VIOLATION=lightweight`: When a contract violation is
-  detected, `std::terminate()` is invoked immediately.  Aside from
+  detected, `std::terminate()` is invoked.  Aside from
   code to check the condition and call `terminate`, none of the
   arguments to a contract checking macro generates any code or data.
 
@@ -226,6 +232,15 @@ strings, or be left undefined.
   effect and generate no code or data.  Not recommended for general
   use, but can be useful for measuring the overall performance impact
   of checking in a program.
+
+Except in `unsafe` mode, a failed check ultimately calls
+[`std::terminate()`](https://en.cppreference.com/w/cpp/error/terminate)
+because:
+1. Continuing in the face of a detected bug is [considered
+   harmful](#about-defensive-programming), and
+2. Unlike other methods
+   of halting, `std::terminate()` allows for [emergency shutdown
+   measures](#emergency-shutdown).
 
 This library can only have one configuration in an executable, so the
 privilege of choosing a configuration for all components always
@@ -299,7 +314,8 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
   Class invariant checks can often give you more bang for your buck,
   though, because they can be used to eliminate the need for
   precondition checks and verbose documentation across many
-  functions.
+  functions.  For example, the second function below benefits by
+  accepting a `date` type whose invariant ensures its validity.
 
   ```c++
   // Returns the day of the week corresponding to the date described
@@ -319,9 +335,6 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
     // implementation starts here.
   }
   ```
-
-  The second function above benefits by accepting a `date` type whose
-  invariant ensures its validity.
 
 - The conditions in your checks should not have side-effects that
   change program behavior; readers expect to be able to skip over
@@ -349,8 +362,8 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
       }
   ```
 
-- If your program needs to take emergency shutdown measures before
-  termination, put those in a [terminate
+- If your program needs to take <a name="emergency-shutdown">emergency
+  shutdown</a> measures before termination, put those in a [terminate
   handler](https://en.cppreference.com/w/cpp/error/terminate_handler)
   that eventually calls
   [`std::abort()`](https://en.cppreference.com/w/cpp/utility/program/abort).
