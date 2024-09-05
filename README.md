@@ -80,7 +80,7 @@ Additionally describing contracts in code and checking them at
 runtime can be  a powerful way to catch bugs early and prevent their
 damaging effects, thus this library.
 
-#### How Reported Errors Fit In
+### How Reported Errors Fit In
 
 The condition that causes a function to throw an exception or
 otherwise report an error to its caller should not be treated as a
