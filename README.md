@@ -12,7 +12,6 @@ because failure to satisfy contracts typically leads to [undefined
 behavior](https://en.wikipedia.org/wiki/Undefined_behavior), which can
 manifest as crashes, data loss, and security vulnerabilities.  
 
-This library 
 This library provides [macros](#basic-c-usage)  for checking preconditions and
 invariants, and can be viewed as an improvement upon the
 standard [`assert`](https://en.cppreference.com/w/cpp/error/assert)
