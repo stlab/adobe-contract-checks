@@ -410,9 +410,9 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
 Checking postconditions is practically the entire raison d'être of
 unit tests, and many good frameworks for unit testing exist.  Adding a
 postcondition check to this library would just create confusion about
-where postcondition checks should go and the true purpose of unit
-testing. Also postcondition checks for most mutating functions need to
-makes an initial copy of everything being mutated, which can be
+where postcondition checks belong and about the purpose of unit
+testing. Also, postcondition checks for most mutating functions need to
+make an initial copy of everything being mutated, which can be
 prohibitively expensive even for debug builds.
 
 ### Why This Library Does Not Throw Exceptions
