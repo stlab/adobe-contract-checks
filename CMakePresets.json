@@ -9,17 +9,8 @@
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
                 "BUILD_TESTING": "ON"
             }
-        }
-    ],
-    "testPresets": [
-        {
-            "name": "debug",
-            "description": "",
-            "displayName": "",
-            "configurePreset": "test-debug"
         }
     ]
 }
