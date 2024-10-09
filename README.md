@@ -487,7 +487,7 @@ The usual procedures for development with CMake apply.  One typical
 set of commands might be:
 
 ```sh
-cmake -DBUILD_TESTING -Wno-dev -S . -B ../build -GNinja        # configure
-cmake --build ../build                         # build/rebuild after changes
-ctest --output-on-failure --test-dir ../build  # test
+cmake -DBUILD_TESTING=1 -Wno-dev -S . -B ../build -GNinja
+cmake --build ../build
+ctest --output-on-failure --test-dir ../build
 ```
