@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
+
 # This template attempts to be "fetch_content"-able
 # so that it works well with tools like CPM or other
 # manual dependency management
@@ -57,7 +58,7 @@ add_library(adobe_contract_checking::adobe_contract_checking_warnings ALIAS adob
 add_subdirectory(configured_files)
 
 # Adding the src:
-add_subdirectory(src)
+# add_subdirectory(src)
 
 # STUFF WE WANT TO KEEP
 #
@@ -94,7 +95,6 @@ endif()
 
 if(BUILD_TESTING)
   include(CTest)
-  message(AUTHOR_WARNING "Building Tests. Be sure to check out test/constexpr_tests.cpp for constexpr testing")
   add_subdirectory(test)
 endif()
 

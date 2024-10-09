@@ -4,6 +4,7 @@ if(BUILD_TESTING)
   FetchContent_Declare(
     googletest
     URL https://github.com/google/googletest/archive/ff233bdd4cac0a0bf6e5cd45bda3406814cb2796.zip
+    DOWNLOAD_EXTRACT_TIMESTAMP "ON"
   )
   # For Windows: Prevent overriding the parent project's compiler/linker settings
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)

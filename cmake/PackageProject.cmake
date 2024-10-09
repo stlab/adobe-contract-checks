@@ -157,7 +157,9 @@ function(adobe_contract_checking_package_project)
   # download ForwardArguments
   FetchContent_Declare(
     _fargs
-    URL https://github.com/polysquare/cmake-forward-arguments/archive/8c50d1f956172edb34e95efa52a2d5cb1f686ed2.zip)
+    URL https://github.com/polysquare/cmake-forward-arguments/archive/8c50d1f956172edb34e95efa52a2d5cb1f686ed2.zip
+    DOWNLOAD_EXTRACT_TIMESTAMP "ON"
+    )
   FetchContent_GetProperties(_fargs)
   if(NOT _fargs_POPULATED)
     FetchContent_Populate(_fargs)
