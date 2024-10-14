@@ -86,6 +86,8 @@ namespace detail {
 #define INTERNAL_ADOBE_CONTRACT_VIOLATED(condition, kind, file, line, message) \
   ::adobe_contract_violated_verbose(condition, kind, file, line, message)
 
+#include <cstdint>
+
 [[noreturn]] extern void adobe_contract_violated_verbose(const char *condition,
   adobe::contract_violation_kind kind,
   const char *file,
