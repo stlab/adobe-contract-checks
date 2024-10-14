@@ -94,6 +94,14 @@ adobe_contract_checking_add_test(unsafe_configuration_tests)
 target_compile_definitions(unsafe_configuration_tests PRIVATE
   "ADOBE_CONTRACT_VIOLATION=unsafe")
 
+adobe_contract_checking_add_test(custom_verbose_configuration_tests)
+target_compile_definitions(custom_verbose_configuration_tests PRIVATE
+  "ADOBE_CONTRACT_VIOLATION=custom_verbose")
+
+adobe_contract_checking_add_test(custom_lightweight_configuration_tests)
+target_compile_definitions(custom_lightweight_configuration_tests PRIVATE
+  "ADOBE_CONTRACT_VIOLATION=custom_lightweight")
+
 adobe_contract_checking_add_test(inadequate_arity_checking_tests)
 
 # Adds a test of this library, with executable target "${base_name}_test"
