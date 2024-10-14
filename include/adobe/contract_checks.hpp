@@ -37,7 +37,8 @@
 #define INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD
 #endif
 
-#include <exception>// for std::terminate();
+#include <cstdint>// for std::uint32_t
+#include <exception>// for std::terminate()
 namespace adobe {
 enum class contract_violation_kind { precondition, invariant };
 }// namespace adobe
