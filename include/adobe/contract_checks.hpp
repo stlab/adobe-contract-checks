@@ -1,3 +1,11 @@
+/*
+    Copyright 2024 Adobe
+    Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file LICENSE file or copy at http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+/**************************************************************************************************/
+
 #ifndef ADOBE_CONTRACT_CHECKS_HPP
 #define ADOBE_CONTRACT_CHECKS_HPP
 
@@ -37,8 +45,6 @@
 #define INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD
 #endif
 
-#include <cstdint>// for std::uint32_t
-#include <exception>// for std::terminate()
 namespace adobe {
 enum class contract_violation_kind { precondition, invariant };
 }// namespace adobe
@@ -52,6 +58,7 @@ enum class contract_violation_kind { precondition, invariant };
 
 #include <cstdint>
 #include <cstdio>
+#include <exception>
 
 namespace adobe {
 namespace detail {
@@ -79,6 +86,8 @@ namespace detail {
 }// namespace adobe
 
 #elif INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR == INTERNAL_ADOBE_CONTRACT_VIOLATION_lightweight
+
+#include <exception>
 
 #define INTERNAL_ADOBE_CONTRACT_VIOLATED(condition, kind, file, line, message) ::std::terminate()
 

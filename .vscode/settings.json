@@ -1,3 +1,4 @@
 {
-  "cmake.ctest.testExplorerIntegrationEnabled": false
+  "cmake.ctest.testExplorerIntegrationEnabled": false,
+  "C_Cpp.autoAddFileAssociations": false
 }
