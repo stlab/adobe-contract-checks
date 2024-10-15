@@ -94,23 +94,27 @@ namespace detail {
 #elif INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR == INTERNAL_ADOBE_CONTRACT_VIOLATION_custom_verbose
 
 #define INTERNAL_ADOBE_CONTRACT_VIOLATED(condition, kind, file, line, message) \
-  ::adobe_contract_violated_verbose(condition, kind, file, line, message)
+  ::adobe::contract_violated_verbose(condition, kind, file, line, message)
 
 #include <cstdint>
 
-[[noreturn]] extern void adobe_contract_violated_verbose(const char *condition,
+namespace adobe {
+[[noreturn]] extern void contract_violated_verbose(const char *condition,
   adobe::contract_violation_kind kind,
   const char *file,
   std::uint32_t line,
   const char *message);
+}
 
 #elif INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR \
   == INTERNAL_ADOBE_CONTRACT_VIOLATION_custom_lightweight
 
 #define INTERNAL_ADOBE_CONTRACT_VIOLATED(condition, kind, file, line, message) \
-  ::adobe_contract_violated_lightweight()
+  ::adobe::contract_violated_lightweight()
 
-[[noreturn]] extern void adobe_contract_violated_lightweight();
+namespace adobe {
+[[noreturn]] extern void contract_violated_lightweight();
+}
 
 #elif INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR == INTERNAL_ADOBE_CONTRACT_VIOLATION_unsafe
 
@@ -181,9 +185,9 @@ static_assert(false,
 //
 // Expands to a statement that reports a contract violation of the
 // given kind (with <message>, if supplied) when <condition> is false.
-#define ADOBE_CONTRACT_CHECK(kind, ...)                                                      \
-  INTERNAL_ADOBE_MSVC_EXPAND(INTERNAL_ADOBE_THIRD_ARGUMENT(                                  \
-    __VA_ARGS__, INTERNAL_ADOBE_CONTRACT_CHECK_2, INTERNAL_ADOBE_CONTRACT_CHECK_1, ignored)( \
-    kind, __VA_ARGS__))
+#define ADOBE_CONTRACT_CHECK(kind, ...)                                 \
+  INTERNAL_ADOBE_MSVC_EXPAND(INTERNAL_ADOBE_THIRD_ARGUMENT(__VA_ARGS__, \
+    INTERNAL_ADOBE_CONTRACT_CHECK_2,                                    \
+    INTERNAL_ADOBE_CONTRACT_CHECK_1)(kind, __VA_ARGS__))
 
 #endif

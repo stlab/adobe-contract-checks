@@ -1,21 +1,26 @@
 #include "adobe/contract_checks.hpp"
+
 #include "portable_death_tests.hpp"
+
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
 #include <array>
 #include <cstdint>
 #include <cstdio>
 #include <exception>
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
 #include <stdexcept>
 
 // Throws a std::logic_error with a message constructed from the arguments.
-[[noreturn]] void adobe_contract_violated_verbose(const char *condition,
+[[noreturn]] void ::adobe::contract_violated_verbose(const char *condition,
   adobe::contract_violation_kind kind,
   const char *file,
   std::uint32_t line,
   const char *message)
 {
-  std::array<char, 1024> output{};
+  constexpr std::size_t max_output_size = 1024;
+  std::array<char, max_output_size> output{};
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg, hicpp-vararg)
   (void)std::snprintf(output.data(),
     sizeof(output),
     "%s:%d: %s (%s). %s\n",
@@ -30,12 +35,12 @@
 
 namespace {
 
-// Expects that `f()` throws an exception and that the exception's `what()` method contains the
+// Expects that `fun()` throws an exception and that the exception's `what()` method contains the
 // `match` regex.
-template<class F> void expect_throw(F f, const char *match)
+template<class F> void expect_throw(F fun, const char *match)
 {
   try {
-    f();
+    fun();
   } catch (const std::exception &e) {
     EXPECT_THAT(e.what(), testing::ContainsRegex(match));
     return;

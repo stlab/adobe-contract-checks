@@ -3,9 +3,9 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 
-[[noreturn]] void adobe_contract_violated_lightweight()
+[[noreturn]] void ::adobe::contract_violated_lightweight()
 {
-  throw std::logic_error("adobe_contract_violated_lightweight");
+  throw std::logic_error("::adobe::contract_violated_lightweight");
 }
 
 TEST(CustomLightweightConfiguration, FailedChecksThrow)
