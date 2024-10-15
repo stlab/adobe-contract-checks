@@ -57,7 +57,6 @@ add_library(adobe_contract_checking::adobe_contract_checking_warnings ALIAS adob
 add_subdirectory(configured_files)
 
 # Adding the src:
-# add_subdirectory(src)
 
 # STUFF WE WANT TO KEEP
 #
