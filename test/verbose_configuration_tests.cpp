@@ -13,6 +13,7 @@ TEST(VerboseConfigurationDeathTest, ContractViolationsCauseAbort)
   EXPECT_ABORT(ADOBE_INVARIANT(false), "");
 }
 
+// LINE_STRING turns __LINE__ into a string literal.
 #define STRINGIZE(x) STRINGIZE2(x)// NOLINT(cppcoreguidelines-macro-usage)
 #define STRINGIZE2(x) #x// NOLINT(cppcoreguidelines-macro-usage)
 #define LINE_STRING STRINGIZE(__LINE__)// NOLINT(cppcoreguidelines-macro-usage)
