@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 
+// Throws a std::logic_error with a message constructed from the arguments.
 [[noreturn]] void adobe_contract_violated_verbose(const char *condition,
   adobe::contract_violation_kind kind,
   const char *file,
@@ -29,6 +30,8 @@
 
 namespace {
 
+// Expects that `f()` throws an exception and that the exception's `what()` method contains the
+// `match` regex.
 template<class F> void expect_throw(F f, const char *match)
 {
   try {
@@ -41,11 +44,12 @@ template<class F> void expect_throw(F f, const char *match)
 
 }// namespace
 
+// LINE_STRING turns __LINE__ into a string literal.
 #define STRINGIZE(x) STRINGIZE2(x)// NOLINT(cppcoreguidelines-macro-usage)
 #define STRINGIZE2(x) #x// NOLINT(cppcoreguidelines-macro-usage)
 #define LINE_STRING STRINGIZE(__LINE__)// NOLINT(cppcoreguidelines-macro-usage)
 
-TEST(CustomVerboseConfigurationDeathTest, OneArgumentFormsAbortWithCorrectOutput)
+TEST(CustomVerboseConfiguration, OneArgumentFormsCallHandlerWithCorrectArguments)
 {
   // clang-format off
   expect_throw([] { ADOBE_PRECONDITION(false); }, "custom_verbose_configuration_tests\\.cpp:" LINE_STRING
@@ -55,7 +59,7 @@ TEST(CustomVerboseConfigurationDeathTest, OneArgumentFormsAbortWithCorrectOutput
   // clang-format on
 }
 
-TEST(CustomVerboseConfigurationDeathTest, TwoArgumentFormsAbortWithCorrectOutput)
+TEST(CustomVerboseConfiguration, TwoArgumentFormsCallHandlerWithCorrectArguments)
 {
   // clang-format off
   expect_throw([] { ADOBE_PRECONDITION(false, "% Message %"); }, "custom_verbose_configuration_tests\\.cpp:" LINE_STRING

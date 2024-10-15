@@ -8,7 +8,7 @@
   throw std::logic_error("adobe_contract_violated_lightweight");
 }
 
-TEST(CustomLightweightConfigurationDeathTest, FailedChecksThrow)
+TEST(CustomLightweightConfiguration, FailedChecksThrow)
 {
   EXPECT_THROW(ADOBE_PRECONDITION(false), std::logic_error);
   EXPECT_THROW(ADOBE_INVARIANT(false), std::logic_error);

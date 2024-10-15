@@ -243,10 +243,11 @@ strings, or be left undefined, in which case it defaults to `verbose`.
   }
   ```
 
-  The arguments provide a string version of the failed condition, the contract violation kind
-  (`precondition` or `invariant`), the file and line number of the failed check, and the optional
-  message. The function should report the violation in a way that is appropriate for the
-  application. The function must not return.
+  The parameters are a string representation of the failed condition, the contract violation kind
+  (`precondition` or `invariant`), the file and line number of the failed check, and the
+  message parameter to the failing check macro, or the empty string if no message was provided.
+  The function should report the violation in a way that is appropriate for the
+  application, and must not return to its caller.
 
 - `ADOBE_CONTRACT_VIOLATION=custom_lightweight`: When a contract violation is detected, a custom
   handler is invoked. The client must define the handler at global scope with the signature:
@@ -257,7 +258,8 @@ strings, or be left undefined, in which case it defaults to `verbose`.
   }
   ```
 
-  The function should report the violation in a way that is appropriate for the application. The
+  The function should report the violation in a way that is appropriate for the application, and
+  must not return to its caller.
   function must not return.
 
 In `verbose` and `lightweight` modes, a failed check ultimately calls
@@ -521,4 +523,4 @@ cmake --build ../build
 ctest --output-on-failure --test-dir ../build
 ```
 
-**VSCode Note**: The CMake Test Explorer integration is disabled in the `.vscode/settings.json` file. It breaks the test detection. To run tests use the `Run CTest` command. If you toggle the integration option on and run the tests and then toggle it off again and refresh the Test Explorer panel, you can then use the panel to run and debug tests individually. If you see `_NOT_BUILT` in the ctest output, it is because test explorer integration is enabled. The issue is reported [here](https://github.com/microsoft/vscode-cmake-tools/issues/3358#issuecomment-2403267565).
+**VSCode CMake Plugin Note**: Test Explorer integration has been disabled in the `.vscode/settings.json` file, because it [breaks test detection](https://github.com/microsoft/vscode-cmake-tools/issues/3358). If you see `_NOT_BUILT` in the CTest output, test explorer integration was somehow enabled at configure time.
