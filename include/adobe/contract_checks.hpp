@@ -185,9 +185,9 @@ static_assert(false,
 //
 // Expands to a statement that reports a contract violation of the
 // given kind (with <message>, if supplied) when <condition> is false.
-#define ADOBE_CONTRACT_CHECK(kind, ...)                                 \
-  INTERNAL_ADOBE_MSVC_EXPAND(INTERNAL_ADOBE_THIRD_ARGUMENT(__VA_ARGS__, \
-    INTERNAL_ADOBE_CONTRACT_CHECK_2,                                    \
-    INTERNAL_ADOBE_CONTRACT_CHECK_1)(kind, __VA_ARGS__))
+#define ADOBE_CONTRACT_CHECK(kind, ...)                                                      \
+  INTERNAL_ADOBE_MSVC_EXPAND(INTERNAL_ADOBE_THIRD_ARGUMENT(                                  \
+    __VA_ARGS__, INTERNAL_ADOBE_CONTRACT_CHECK_2, INTERNAL_ADOBE_CONTRACT_CHECK_1, ignored)( \
+    kind, __VA_ARGS__))
 
 #endif
