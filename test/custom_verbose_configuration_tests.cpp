@@ -14,13 +14,13 @@
   std::uint32_t line,
   const char *message)
 {
-  throw std::logic_error(
-    (std::ostringstream{} << file << ":" << line << ": "
-                          << (kind == adobe::contract_violation_kind::precondition
-                                 ? "Precondition violated"
-                                 : "Invariant not upheld")
-                          << " (" << condition << "). " << message << "\n")
-      .str());
+  throw std::logic_error{ (std::ostringstream{}
+                           << file << ":" << line << ": "
+                           << (kind == adobe::contract_violation_kind::precondition
+                                  ? "Precondition violated"
+                                  : "Invariant not upheld")
+                           << " (" << condition << "). " << message << "\n")
+      .str() };
 }
 
 namespace {
