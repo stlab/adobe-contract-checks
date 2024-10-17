@@ -1,11 +1,10 @@
 #include "adobe/contract_checks.hpp"
 #include "portable_death_tests.hpp"
-#include <array>
 #include <cstdint>
-#include <cstdio>
 #include <exception>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <sstream>
 #include <stdexcept>
 
 // Throws a std::logic_error with a message constructed from the arguments.
@@ -15,17 +14,13 @@
   std::uint32_t line,
   const char *message)
 {
-  std::array<char, 1024> output{};
-  (void)std::snprintf(output.data(),
-    sizeof(output),
-    "%s:%d: %s (%s). %s\n",
-    file,
-    static_cast<int>(line),
-    kind == adobe::contract_violation_kind::precondition ? "Precondition violated"
-                                                         : "Invariant not upheld",
-    condition,
-    message);
-  throw std::logic_error(output.data());
+  throw std::logic_error(
+    (std::ostringstream{} << file << ":" << line << ": "
+                          << (kind == adobe::contract_violation_kind::precondition
+                                 ? "Precondition violated"
+                                 : "Invariant not upheld")
+                          << " (" << condition << "). " << message << "\n")
+      .str());
 }
 
 namespace {
