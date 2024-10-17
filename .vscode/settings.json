@@ -1,4 +1,7 @@
 {
   "cmake.ctest.testExplorerIntegrationEnabled": false,
-  "C_Cpp.autoAddFileAssociations": false
+  "C_Cpp.autoAddFileAssociations": false,
+  "[cpp]": {
+    "editor.formatOnSave": true
+  }
 }
