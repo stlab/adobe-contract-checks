@@ -1,32 +1,17 @@
 ---
 Checks:
-  - '*'
-  - '-abseil-*'
-  - '-altera-*'
-  - '-android-*'
-  - '-fuchsia-*'
-  - '-google-*'
-  - '-llvm*'
-  - '-modernize-use-trailing-return-type'
-  - '-zircon-*'
-  - '-readability-else-after-return'
-  - '-readability-static-accessed-through-instance'
-  - '-readability-avoid-const-params-in-decls'
-  - '-cppcoreguidelines-non-private-member-variables-in-classes'
-  - '-misc-non-private-member-variables-in-classes'
-  - '-readability-function-cognitive-complexity'
-  - '-readability-identifier-length'
+  - "*"
+  - "-altera-unroll-loops" # Required for gtest
+  - "-fuchsia-*" # Internal Zircon https://fuchsia.dev/fuchsia-src/development/languages/c-cpp/cxx
+  - "-llvmlibc-*" # Internal llvm libc flags
+  - "-readability-function-cognitive-complexity" # Required for gtest
 
-WarningsAsErrors: ''
-HeaderFilterRegex: ''
+WarningsAsErrors: ""
+HeaderFilterRegex: ""
 FormatStyle: none
-
-CheckOptions:
-  - key: readability-identifier-length.IgnoredVariableNames
-    value: 'x|y|z'
-  - key: readability-identifier-length.IgnoredParameterNames
-    value: 'x|y|z'
-
+# CheckOptions:
+#   - key: readability-identifier-length.IgnoredVariableNames
+#     value: "x|y|z"
 # Local Variables:
 # mode: yaml
 # End:
