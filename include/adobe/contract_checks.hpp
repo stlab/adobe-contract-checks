@@ -1,9 +1,19 @@
+/*
+    Copyright 2024 Adobe
+    Distributed under the Boost Software License, Version 1.0.
+    (See accompanying file LICENSE file or copy at http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+/**************************************************************************************************/
+
 #ifndef ADOBE_CONTRACT_CHECKS_HPP
 #define ADOBE_CONTRACT_CHECKS_HPP
 
 #define INTERNAL_ADOBE_CONTRACT_VIOLATION_verbose 1
 #define INTERNAL_ADOBE_CONTRACT_VIOLATION_lightweight 2
 #define INTERNAL_ADOBE_CONTRACT_VIOLATION_unsafe 3
+#define INTERNAL_ADOBE_CONTRACT_VIOLATION_custom_verbose 4
+#define INTERNAL_ADOBE_CONTRACT_VIOLATION_custom_lightweight 5
 
 // INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR is not a function-style
 // macro because it lets us give a better diagnostic on
@@ -35,11 +45,8 @@
 #define INTERNAL_ADOBE_CONTRACT_VIOLATION_LIKELIHOOD
 #endif
 
-#include <exception>// for std::terminate();
 namespace adobe {
-namespace detail {
-  enum class contract_violation_kind { precondition, invariant };
-}
+enum class contract_violation_kind { precondition, invariant };
 }// namespace adobe
 
 #endif
@@ -51,6 +58,7 @@ namespace detail {
 
 #include <cstdint>
 #include <cstdio>
+#include <exception>
 
 namespace adobe {
 namespace detail {
@@ -79,7 +87,30 @@ namespace detail {
 
 #elif INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR == INTERNAL_ADOBE_CONTRACT_VIOLATION_lightweight
 
+#include <exception>
+
 #define INTERNAL_ADOBE_CONTRACT_VIOLATED(condition, kind, file, line, message) ::std::terminate()
+
+#elif INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR == INTERNAL_ADOBE_CONTRACT_VIOLATION_custom_verbose
+
+#define INTERNAL_ADOBE_CONTRACT_VIOLATED(condition, kind, file, line, message) \
+  ::adobe_contract_violated_verbose(condition, kind, file, line, message)
+
+#include <cstdint>
+
+[[noreturn]] extern void adobe_contract_violated_verbose(const char *condition,
+  adobe::contract_violation_kind kind,
+  const char *file,
+  std::uint32_t line,
+  const char *message);
+
+#elif INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR \
+  == INTERNAL_ADOBE_CONTRACT_VIOLATION_custom_lightweight
+
+#define INTERNAL_ADOBE_CONTRACT_VIOLATED(condition, kind, file, line, message) \
+  ::adobe_contract_violated_lightweight()
+
+[[noreturn]] extern void adobe_contract_violated_lightweight();
 
 #elif INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR == INTERNAL_ADOBE_CONTRACT_VIOLATION_unsafe
 
@@ -135,7 +166,7 @@ static_assert(false,
 // Expands to a statement that reports a precondition violation (with
 // <message> if supplied) when <condition> is false.
 #define ADOBE_PRECONDITION(...) \
-  ADOBE_CONTRACT_CHECK(::adobe::detail::contract_violation_kind::precondition, __VA_ARGS__)
+  ADOBE_CONTRACT_CHECK(::adobe::contract_violation_kind::precondition, __VA_ARGS__)
 
 // ADOBE_INVARIANT(<condition>);
 // ADOBE_INVARIANT(<condition>, <message: const char*>);
@@ -143,7 +174,7 @@ static_assert(false,
 // Expands to a statement that reports an invariant violation (with
 // <message> if supplied) when <condition> is false.
 #define ADOBE_INVARIANT(...) \
-  ADOBE_CONTRACT_CHECK(::adobe::detail::contract_violation_kind::invariant, __VA_ARGS__)
+  ADOBE_CONTRACT_CHECK(::adobe::contract_violation_kind::invariant, __VA_ARGS__)
 
 // ADOBE_CONTRACT_CHECK(<integer kind>, <condition>);
 // ADOBE_CONTRACT_CHECK(<integer kind>, <condition>, <message: const char*>);

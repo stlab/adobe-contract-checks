@@ -1,42 +1,42 @@
 [![ci](https://github.com/stlab/adobe-contract-checks/actions/workflows/ci.yml/badge.svg)](https://github.com/stlab/adobe-contract-checks/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/stlab/adobe-contract-checks/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/stlab/adobe-contract-checks/actions/workflows/codeql-analysis.yml)
 
-------
+---
 
 # Adobe Contract Checking
 
 This library is for checking that software
 [contracts](https://en.wikipedia.org/wiki/Design_by_contract) are
-upheld.  In C++ these checks can be especially important for safety
+upheld. In C++ these checks can be especially important for safety
 because failure to satisfy contracts typically leads to [undefined
 behavior](https://en.wikipedia.org/wiki/Undefined_behavior), which can
-manifest as crashes, data loss, and security vulnerabilities.  
+manifest as crashes, data loss, and security vulnerabilities.
 
-This library provides [macros](#basic-c-usage)  for checking preconditions and
+This library provides [macros](#basic-c-usage) for checking preconditions and
 invariants, and can be viewed as an improvement upon the
 standard [`assert`](https://en.cppreference.com/w/cpp/error/assert)
-macro.  However, the discipline and rationales documented here are 
+macro. However, the discipline and rationales documented here are
 just as important to the library's value as are its mechanics.
 
 ## Design by Contract
 
 [Design by Contract](https://en.wikipedia.org/wiki/Design_by_contract)
-is *the* industry-standard way to describe the requirements and
-guarantees of any software component.  It is based on three concepts:
+is _the_ industry-standard way to describe the requirements and
+guarantees of any software component. It is based on three concepts:
 
 - **Preconditions**: what the caller of a function must ensure for the
-  function to behave as documented.  A precondition violation
+  function to behave as documented. A precondition violation
   indicates a bug in the caller.
 
 - **Postconditions** describe a function's side-effects and return
   value. Postconditions need not be upheld if the function reports an
   error (such as memory exhaustion), or if preconditions were
-  violated.  Otherwise, a postcondition violation indicates
+  violated. Otherwise, a postcondition violation indicates
   a bug in the callee.
 
 - **Invariants**: conditions that always hold at one or more specific
   points in the
-  code.  The most common kind of invariants are **class invariants**,
+  code. The most common kind of invariants are **class invariants**,
   which hold wherever it is valid to inspect an instance from
   outside the class, but other invariants (especially [loop
   invariants](https://en.wikipedia.org/wiki/Loop_invariant)) are also useful.
@@ -46,11 +46,12 @@ Postconditions should be checked by unit tests
 
 ### Documenting Contracts
 
-**The minimal documentation required for any component is its contract**. 
+**The minimal documentation required for any component is its contract**.
 Writing this documentation need not be a burden; usually, a short sentence
 fragment is sufficient ([examples](#basic-c-usage)).
+
 - The contract of a function describes its preconditions, postconditions
-  (which include the return value). 
+  (which include the return value).
 - The contract of a class describes its publicly-visible invariants.
 
 **Documentation is the primary vehicle for expressing
@@ -59,7 +60,7 @@ contracts**
 <details>
 <summary markdown='span'><em>Rationale</em></summary>
 
-1. Some contracts cannot be checked at runtime.  For example, there's no
+1. Some contracts cannot be checked at runtime. For example, there's no
    way to check these preconditions:
    ```c++
    /// Returns the frobnication of `p` and `f`.
@@ -71,22 +72,22 @@ contracts**
    ```
 2. Reasoning locally about code depends on being able to understand
    the contract of each component the code uses without looking at the
-   component's implementation.  From a client's point of view, contract
+   component's implementation. From a client's point of view, contract
    checks are hidden inside the implementation.
 
 </details>
 
 Additionally describing contracts in code and checking them at
-runtime can be  a powerful way to catch bugs early and prevent their
+runtime can be a powerful way to catch bugs early and prevent their
 damaging effects. That's the role of this library.
 
 ### How Reported Errors Fit In
 
 The condition that causes a function to throw an exception or
 otherwise report an error to its caller should not be treated as a
-precondition.  Instead, make the error reporting behavior part of the
+precondition. Instead, make the error reporting behavior part of the
 function's specification: document the behavior and test it to make
-sure that it works.  Also, do not describe the error report as part of
+sure that it works. Also, do not describe the error report as part of
 the postcondition. **Reporting an error to the caller exempts a
 function from fulfilling postconditions** and can be thought of as an
 unavoidable failure to fulfill postconditions.
@@ -101,25 +102,25 @@ std::unique_ptr<Widget> build_widget();
 ```
 
 The first line of documentation above describes the function's
-postcondition.  The second line describes its error reporting,
-separately from the postcondition.  You can eliminate the need to
+postcondition. The second line describes its error reporting,
+separately from the postcondition. You can eliminate the need to
 document exceptions by setting a project-wide policy that, unless a
-function is `noexcept`, it can throw anything.  You can eliminate the
+function is `noexcept`, it can throw anything. You can eliminate the
 need to document returned errors by encoding the ability to return an
-error in the function's signature. Documenting *which* exceptions can be
+error in the function's signature. Documenting _which_ exceptions can be
 thrown or errors reported is not crucial, but documenting the fact
-*that* an error can occur is.
+_that_ an error can occur is.
 
 Unless otherwise specified in the function's documentation, a reported
 error means all objects the function would otherwise modify are
 invalid for all uses, except as the target of destruction or
-assignment.  **Discarding this invalid data is the obligation of code
+assignment. **Discarding this invalid data is the obligation of code
 that stops error propagation to callers**.
 
 Because this invalid data must be discarded, **code that reports or
 propagates errors need not uphold class invariants**;
 the only properties of the class that must be maintained are
-destructibility and assignability.  Note that this policy is less
+destructibility and assignability. Note that this policy is less
 strict than what is implied by the [basic exception safety
 guarantee](https://en.wikipedia.org/wiki/Exception_safety#Classification),
 and supersedes the stricter policy with the endorsement of its inventor.
@@ -129,19 +130,19 @@ easy if types under mutation have [value
 semantics](https://www.jot.fm/issues/issue_2022_02/article2.pdf),
 because data forms a tree and the invalidated data is always uniquely
 a part of the objects being mutated at the level of the error-handling
-code.  Otherwise it may be necessary to discard other parts of the
+code. Otherwise it may be necessary to discard other parts of the
 object graph.
 
 The usual, and most useful, way of specifying that data under mutation
-is *not* invalidated is by making the [strong
+is _not_ invalidated is by making the [strong
 guarantee](https://en.wikipedia.org/wiki/Exception_safety#Classification)
 that there are no effects in case of an error (where possible without loss
-of efficiency).  When the callee can make that promise, it exempts the
+of efficiency). When the callee can make that promise, it exempts the
 caller from discarding invalid data.
 
 ## Basic C++ Usage
 
-This is a header-only library.  To use it from C++, simply put the
+This is a header-only library. To use it from C++, simply put the
 `include` directory of this repository in your `#include` path, and
 `#include <adobe/contract_checks.hpp>`.
 
@@ -214,27 +215,57 @@ public:
 ## Configuration
 
 The behavior of this library is configured by one preprocessor symbol,
-`ADOBE_CONTRACT_VIOLATION`.  It can be defined to one of three
+`ADOBE_CONTRACT_VIOLATION`. It can be defined to one of three
 strings, or be left undefined, in which case it defaults to `verbose`.
 
 - `ADOBE_CONTRACT_VIOLATION=verbose`: as much information as possible
   is collected from the site of a detected contract violation and
   reported to the standard error stream before `std::terminate()`
   is called.
-  
 - `ADOBE_CONTRACT_VIOLATION=lightweight`: When a contract violation is
-  detected, `std::terminate()` is invoked.  Aside from
+  detected, `std::terminate()` is invoked. Aside from
   code to check the condition and call `terminate`, none of the
   arguments to a contract checking macro generates any code or data.
 
 - `ADOBE_CONTRACT_VIOLATION=unsafe`: Contract checking macros have no
-  effect and generate no code or data.  Not recommended for general
+  effect and generate no code or data. Not recommended for general
   use, but can be useful for measuring the overall performance impact
   of checking in a program.
 
-Except in `unsafe` mode, a failed check ultimately calls
+- `ADOBE_CONTRACT_VIOLATION=custom_verbose`: When a contract violation is detected, a custom handler
+  is invoked. The client must define the handler at global scope with the signature:
+
+  ```cpp
+  [[noreturn]] void adobe_contract_violation_verbose(const char *condition,
+    adobe::contract_violation_kind kind, const char *file, std::uint32_t line,
+    const char *message) {
+      // implementation
+  }
+  ```
+
+  The parameters are a string representation of the failed condition, the contract violation kind
+  (`precondition` or `invariant`), the file and line number of the failed check, and the
+  message parameter to the failing check macro, or the empty string if no message was provided.
+  The function should report the violation in a way that is appropriate for the
+  application, and must not return to its caller.
+
+- `ADOBE_CONTRACT_VIOLATION=custom_lightweight`: When a contract violation is detected, a custom
+  handler is invoked. The client must define the handler at global scope with the signature:
+
+  ```cpp
+  [[noreturn]] void adobe_contract_violation_lightweight() {
+      // implementation
+  }
+  ```
+
+  The function should report the violation in a way that is appropriate for the application, and
+  must not return to its caller.
+  function must not return.
+
+In `verbose` and `lightweight` modes, a failed check ultimately calls
 [`std::terminate()`](https://en.cppreference.com/w/cpp/error/terminate)
 because:
+
 1. Continuing in the face of a detected bug is [considered
    harmful](#about-defensive-programming), and
 2. Unlike other methods
@@ -303,7 +334,7 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
   later. Checks are often critical for safety. [Configuration
   options](#configuration) can be used to mitigate or eliminate costs
   later if necessary. That said, **do not add checks that change
-  algorithmic complexity**.  Turning an O(1) operation into an O(n)
+  algorithmic complexity**. Turning an O(1) operation into an O(n)
   operation is not acceptable.
 
 - If you have to prioritize, precondition checks are the most
@@ -313,7 +344,7 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
   Class invariant checks can often give you more bang for your buck,
   though, because they can be used to eliminate the need for
   precondition checks and verbose documentation across many
-  functions.  For example, the second function below benefits by
+  functions. For example, the second function below benefits by
   accepting a `date` type whose invariant ensures its validity.
 
   ```c++
@@ -344,7 +375,7 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
 
 - Give your `struct` or `class` a `bool is_valid() const` method that
   returns `true` if and only if invariants are intact, so that
-  invariant condition checking can be centralized.  Invoke
+  invariant condition checking can be centralized. Invoke
   `ADOBE_INVARIANT(is_valid())` from each public mutating friend or
   member function or constructor just before each `return`, or before
   `*this` becomes visible to any other component such as a callback
@@ -367,48 +398,48 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
   that eventually calls
   [`std::abort()`](https://en.cppreference.com/w/cpp/utility/program/abort).
 
-    ```c++
-    #include <cstdlib>
-    #include <exception>
+  ```c++
+  #include <cstdlib>
+  #include <exception>
 
-    [[noreturn]] void emergency_shutdown() noexcept;
+  [[noreturn]] void emergency_shutdown() noexcept;
 
-    const std::terminate_handler previous_terminate_handler
-      = std::set_terminate(emergency_shutdown);
+  const std::terminate_handler previous_terminate_handler
+    = std::set_terminate(emergency_shutdown);
 
-    [[noreturn]] void emergency_shutdown() noexcept
-    {
-      // emergency shutdown measures here.
+  [[noreturn]] void emergency_shutdown() noexcept
+  {
+    // emergency shutdown measures here.
 
-      if (previous_terminate_handler != nullptr)
-        { previous_terminate_handler(); }
-      std::abort();
-    }
-    ...
-    ```
+    if (previous_terminate_handler != nullptr)
+      { previous_terminate_handler(); }
+    std::abort();
+  }
+  ...
+  ```
 
   That way, other reasons for sudden termination, such as
   uncaught exceptions, will still cause emergency shutdown to execute.
 
 - Don't disable critical checks in shipping code unless a measurable
   unacceptable performance cost is found, and after assessing the risk
-  of undefined behavior should the check be skipped.  In that case,
+  of undefined behavior should the check be skipped. In that case,
   disable the expensive checks selectively. For example, if you have
   `NDEBUG` defined in your release build, you can enable the check for
   debug builds only.
 
-   ```
-   #ifndef NDEBUG // too expensive for release
-   ADOBE_PRECONDITION(some_expensive_call());
-   #endif
-   ```
+  ```
+  #ifndef NDEBUG // too expensive for release
+  ADOBE_PRECONDITION(some_expensive_call());
+  #endif
+  ```
 
 ## Rationales
 
 ### Why This Library Provides No Postcondition Check
 
 Checking postconditions is practically the entire raison d'être of
-unit tests, and many good frameworks for unit testing exist.  Adding a
+unit tests, and many good frameworks for unit testing exist. Adding a
 postcondition check to this library would just create confusion about
 where postcondition checks belong and about the purpose of unit
 testing. Also, postcondition checks for most mutating functions need to
@@ -417,11 +448,11 @@ prohibitively expensive even for debug builds.
 
 ### Why This Library Does Not Throw Exceptions
 
-In the original [Eiffel](https://en.wikipedia.org/wiki/Eiffel_(programming_language))
+In the original [Eiffel](<https://en.wikipedia.org/wiki/Eiffel_(programming_language)>)
 programming language implementation of [Design by
 Contract](https://en.wikipedia.org/wiki/Design_by_contract), a contract
 violation would cause an
-exception to be thrown.  On the surface, that might seem at first like
+exception to be thrown. On the surface, that might seem at first like
 a good response to bug detection, but there are several problems:
 
 - It's important that some functions, such as those used in
@@ -434,12 +465,12 @@ a good response to bug detection, but there are several problems:
   back to normal execution, we might as well terminate the program
   (possibly after taking emergency measures). But when a bug is
   discovered, the potential damage to program state is arbitrary, and
-  there is no known recovery action.  Also see the section on
+  there is no known recovery action. Also see the section on
   [defensive programming](#about-defensive-programming) below.
 
 If your function really needs to throw an exception, that should be a
 documented part of its contract, so that response can be tested for
-and callers can respond appropriately.  See [How Reported Errors Fit
+and callers can respond appropriately. See [How Reported Errors Fit
 In](#how-reported-errors-fit-in) for more information.
 
 ### About Defensive Programming
@@ -483,7 +514,7 @@ result of undefined behavior that also scrambled memory or causes
 
 ## Development
 
-The usual procedures for development with CMake apply.  One typical
+The usual procedures for development with CMake apply. One typical
 set of commands might be:
 
 ```sh
@@ -491,3 +522,5 @@ cmake -DBUILD_TESTING=1 -Wno-dev -S . -B ../build -GNinja
 cmake --build ../build
 ctest --output-on-failure --test-dir ../build
 ```
+
+**VSCode CMake Plugin Note**: Test Explorer integration has been disabled in the `.vscode/settings.json` file, because it [breaks test detection](https://github.com/microsoft/vscode-cmake-tools/issues/3358). If you see `_NOT_BUILT` in the CTest output, test explorer integration was somehow enabled at configure time.
