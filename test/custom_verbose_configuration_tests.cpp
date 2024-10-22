@@ -23,7 +23,7 @@
                                   ? "Precondition violated"
                                   : "Invariant not upheld")
                            << " (" << condition << "). " << message << "\n")
-      .str() };
+                            .str() };
 }
 
 namespace {
