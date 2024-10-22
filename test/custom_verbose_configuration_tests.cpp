@@ -7,7 +7,6 @@
 
 #include <array>
 #include <cstdint>
-#include <cstdio>
 #include <exception>
 #include <stdexcept>
 
