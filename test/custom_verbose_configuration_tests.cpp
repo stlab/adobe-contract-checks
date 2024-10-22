@@ -1,6 +1,6 @@
 #include "adobe/contract_checks.hpp"
 
-#include "portable_death_tests.hpp"
+#include "macro_utilities.hpp"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -42,17 +42,12 @@ template<class F> void expect_throw(F fun, const char *match)
 
 }// namespace
 
-// LINE_STRING turns __LINE__ into a string literal.
-#define STRINGIZE(x) STRINGIZE2(x)// NOLINT(cppcoreguidelines-macro-usage)
-#define STRINGIZE2(x) #x// NOLINT(cppcoreguidelines-macro-usage)
-#define LINE_STRING STRINGIZE(__LINE__)// NOLINT(cppcoreguidelines-macro-usage)
-
 TEST(CustomVerboseConfiguration, OneArgumentFormsCallHandlerWithCorrectArguments)
 {
   // clang-format off
-  expect_throw([] { ADOBE_PRECONDITION(false); }, "custom_verbose_configuration_tests\\.cpp:" LINE_STRING
+  expect_throw([] { ADOBE_PRECONDITION(false); }, "custom_verbose_configuration_tests\\.cpp:" ADOBE_INTERNAL_LINE_STRING()
                ": Precondition violated \\(false\\)\\. \n");
-  expect_throw([] { ADOBE_INVARIANT(false); }, "custom_verbose_configuration_tests\\.cpp:" LINE_STRING
+  expect_throw([] { ADOBE_INVARIANT(false); }, "custom_verbose_configuration_tests\\.cpp:" ADOBE_INTERNAL_LINE_STRING()
                ": Invariant not upheld \\(false\\)\\. \n");
   // clang-format on
 }
@@ -60,9 +55,9 @@ TEST(CustomVerboseConfiguration, OneArgumentFormsCallHandlerWithCorrectArguments
 TEST(CustomVerboseConfiguration, TwoArgumentFormsCallHandlerWithCorrectArguments)
 {
   // clang-format off
-  expect_throw([] { ADOBE_PRECONDITION(false, "% Message %"); }, "custom_verbose_configuration_tests\\.cpp:" LINE_STRING
+  expect_throw([] { ADOBE_PRECONDITION(false, "% Message %"); }, "custom_verbose_configuration_tests\\.cpp:" ADOBE_INTERNAL_LINE_STRING()
                ": Precondition violated \\(false\\)\\. % Message %\n"); 
-  expect_throw([] { ADOBE_INVARIANT(false, "% Message %"); }, "custom_verbose_configuration_tests\\.cpp:" LINE_STRING
+  expect_throw([] { ADOBE_INVARIANT(false, "% Message %"); }, "custom_verbose_configuration_tests\\.cpp:" ADOBE_INTERNAL_LINE_STRING()
                ": Invariant not upheld \\(false\\)\\. % Message %\n");
   // clang-format on
 }

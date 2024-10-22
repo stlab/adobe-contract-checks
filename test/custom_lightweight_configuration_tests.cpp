@@ -1,5 +1,4 @@
 #include "adobe/contract_checks.hpp"
-#include "portable_death_tests.hpp"
 #include <gtest/gtest.h>
 #include <stdexcept>
 
