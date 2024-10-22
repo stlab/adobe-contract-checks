@@ -18,19 +18,13 @@
   std::uint32_t line,
   const char *message)
 {
-  constexpr std::size_t max_output_size = 1024;
-  std::array<char, max_output_size> output{};
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg, hicpp-vararg)
-  (void)std::snprintf(output.data(),
-    sizeof(output),
-    "%s:%d: %s (%s). %s\n",
-    file,
-    static_cast<int>(line),
-    kind == adobe::contract_violation_kind::precondition ? "Precondition violated"
-                                                         : "Invariant not upheld",
-    condition,
-    message);
-  throw std::logic_error(output.data());
+  throw std::logic_error{ (std::ostringstream{}
+                           << file << ":" << line << ": "
+                           << (kind == adobe::contract_violation_kind::precondition
+                                  ? "Precondition violated"
+                                  : "Invariant not upheld")
+                           << " (" << condition << "). " << message << "\n")
+      .str() };
 }
 
 namespace {
