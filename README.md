@@ -233,10 +233,10 @@ strings, or be left undefined, in which case it defaults to `verbose`.
   of checking in a program.
 
 - `ADOBE_CONTRACT_VIOLATION=custom_verbose`: When a contract violation is detected, a custom handler
-  is invoked. The client must define the handler at global scope with the signature:
+  is invoked. The client must define the handler in the `adobe` namespace with the signature:
 
   ```cpp
-  [[noreturn]] void adobe_contract_violation_verbose(const char *condition,
+  [[noreturn]] void ::adobe::contract_violated_verbose(const char *condition,
     adobe::contract_violation_kind kind, const char *file, std::uint32_t line,
     const char *message) {
       // implementation
@@ -250,10 +250,10 @@ strings, or be left undefined, in which case it defaults to `verbose`.
   application, and must not return to its caller.
 
 - `ADOBE_CONTRACT_VIOLATION=custom_lightweight`: When a contract violation is detected, a custom
-  handler is invoked. The client must define the handler at global scope with the signature:
+  handler is invoked. The client must define the handler in the `adobe` namespace with the signature:
 
   ```cpp
-  [[noreturn]] void adobe_contract_violation_lightweight() {
+  [[noreturn]] void ::adobe::contract_violated_lightweight() {
       // implementation
   }
   ```

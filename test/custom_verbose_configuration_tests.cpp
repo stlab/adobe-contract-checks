@@ -1,14 +1,17 @@
 #include "adobe/contract_checks.hpp"
+
 #include "portable_death_tests.hpp"
-#include <cstdint>
-#include <exception>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
+#include <cstdint>
+#include <exception>
 #include <sstream>
 #include <stdexcept>
 
 // Throws a std::logic_error with a message constructed from the arguments.
-[[noreturn]] void adobe_contract_violated_verbose(const char *condition,
+[[noreturn]] void ::adobe::contract_violated_verbose(const char *condition,
   adobe::contract_violation_kind kind,
   const char *file,
   std::uint32_t line,
@@ -25,12 +28,12 @@
 
 namespace {
 
-// Expects that `f()` throws an exception and that the exception's `what()` method contains the
+// Expects that `fun()` throws an exception and that the exception's `what()` method contains the
 // `match` regex.
-template<class F> void expect_throw(F f, const char *match)
+template<class F> void expect_throw(F fun, const char *match)
 {
   try {
-    f();
+    fun();
   } catch (const std::exception &e) {
     EXPECT_THAT(e.what(), testing::ContainsRegex(match));
     return;
