@@ -5,9 +5,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <array>
 #include <cstdint>
 #include <exception>
+#include <sstream>
 #include <stdexcept>
 
 // Throws a std::logic_error with a message constructed from the arguments.

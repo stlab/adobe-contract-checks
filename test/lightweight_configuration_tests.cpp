@@ -31,7 +31,7 @@ TEST(LightweightConfiguration, ContractNonViolationsDoNotCauseAbort)
   ADOBE_PRECONDITION(true);
   ADOBE_INVARIANT(true);
 
-  ADOBE_PRECONDITION(true, "% Message %"");
+  ADOBE_PRECONDITION(true, "% Message %");
   ADOBE_INVARIANT(true, "% Message %");
 }
 
