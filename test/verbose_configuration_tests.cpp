@@ -1,5 +1,7 @@
 #include "adobe/contract_checks.hpp"
+#include "macro_utilities.hpp"
 #include "portable_death_tests.hpp"
+
 #include <gtest/gtest.h>
 
 // ****** Death tests should precede non-death tests. *********
@@ -13,17 +15,12 @@ TEST(VerboseConfigurationDeathTest, ContractViolationsCauseAbort)
   EXPECT_ABORT(ADOBE_INVARIANT(false), "");
 }
 
-// LINE_STRING turns __LINE__ into a string literal.
-#define STRINGIZE(x) STRINGIZE2(x)// NOLINT(cppcoreguidelines-macro-usage)
-#define STRINGIZE2(x) #x// NOLINT(cppcoreguidelines-macro-usage)
-#define LINE_STRING STRINGIZE(__LINE__)// NOLINT(cppcoreguidelines-macro-usage)
-
 TEST(VerboseConfigurationDeathTest, OneArgumentFormsAbortWithCorrectOutput)
 {
   // clang-format off
-  EXPECT_ABORT(ADOBE_PRECONDITION(false), "verbose_configuration_tests\\.cpp:" LINE_STRING
+  EXPECT_ABORT(ADOBE_PRECONDITION(false), "verbose_configuration_tests\\.cpp:" ADOBE_INTERNAL_LINE_STRING()
                ": Precondition violated \\(false\\)\\. \n");
-  EXPECT_ABORT(ADOBE_INVARIANT(false), "verbose_configuration_tests\\.cpp:" LINE_STRING
+  EXPECT_ABORT(ADOBE_INVARIANT(false), "verbose_configuration_tests\\.cpp:" ADOBE_INTERNAL_LINE_STRING()
                ": Invariant not upheld \\(false\\)\\. \n");
   // clang-format on
 }
@@ -31,9 +28,9 @@ TEST(VerboseConfigurationDeathTest, OneArgumentFormsAbortWithCorrectOutput)
 TEST(VerboseConfigurationDeathTest, TwoArgumentFormsAbortWithCorrectOutput)
 {
   // clang-format off
-  EXPECT_ABORT(ADOBE_PRECONDITION(false, "% Message %"), "verbose_configuration_tests\\.cpp:" LINE_STRING
+  EXPECT_ABORT(ADOBE_PRECONDITION(false, "% Message %"), "verbose_configuration_tests\\.cpp:" ADOBE_INTERNAL_LINE_STRING()
                ": Precondition violated \\(false\\)\\. % Message %\n");
-  EXPECT_ABORT(ADOBE_INVARIANT(false, "% Message %"), "verbose_configuration_tests\\.cpp:" LINE_STRING
+  EXPECT_ABORT(ADOBE_INVARIANT(false, "% Message %"), "verbose_configuration_tests\\.cpp:" ADOBE_INTERNAL_LINE_STRING()
                ": Invariant not upheld \\(false\\)\\. % Message %\n");
   // clang-format on
 }

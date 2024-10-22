@@ -1,3 +1,5 @@
+#ifndef ADOBE_INTERNAL_PORTABLE_DEATH_TESTS_HPP
+
 #include <gtest/gtest.h>
 #if !defined(GTEST_OS_WINDOWS) && !defined(__EMSCRIPTEN__)
 #include <csignal>
@@ -45,3 +47,5 @@
 #define EXPECT_PORTABLE_DEATH(code, expected_output_regex) EXPECT_DEATH(code, expected_output_regex)
 
 #endif
+
+#endif// ADOBE_INTERNAL_PORTABLE_DEATH_TESTS_HPP
