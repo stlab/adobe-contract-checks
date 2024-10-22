@@ -94,23 +94,27 @@ namespace detail {
 #elif INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR == INTERNAL_ADOBE_CONTRACT_VIOLATION_custom_verbose
 
 #define INTERNAL_ADOBE_CONTRACT_VIOLATED(condition, kind, file, line, message) \
-  ::adobe_contract_violated_verbose(condition, kind, file, line, message)
+  ::adobe::contract_violated_verbose(condition, kind, file, line, message)
 
 #include <cstdint>
 
-[[noreturn]] extern void adobe_contract_violated_verbose(const char *condition,
+namespace adobe {
+[[noreturn]] extern void contract_violated_verbose(const char *condition,
   adobe::contract_violation_kind kind,
   const char *file,
   std::uint32_t line,
   const char *message);
+}
 
 #elif INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR \
   == INTERNAL_ADOBE_CONTRACT_VIOLATION_custom_lightweight
 
 #define INTERNAL_ADOBE_CONTRACT_VIOLATED(condition, kind, file, line, message) \
-  ::adobe_contract_violated_lightweight()
+  ::adobe::contract_violated_lightweight()
 
-[[noreturn]] extern void adobe_contract_violated_lightweight();
+namespace adobe {
+[[noreturn]] extern void contract_violated_lightweight();
+}
 
 #elif INTERNAL_ADOBE_CONTRACT_VIOLATION_BEHAVIOR == INTERNAL_ADOBE_CONTRACT_VIOLATION_unsafe
 
