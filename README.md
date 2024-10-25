@@ -172,6 +172,7 @@ For example,
 #include <climits>
 
 /// A half-open range of integers.
+///
 /// - Invariant: start() <= end().
 class int_range {
   /// The lower bound; if `*this` is non-empty, its
@@ -185,6 +186,7 @@ class int_range {
   bool is_valid() const { return start() <= end(); }
 public:
   /// An instance with the given bounds.
+  ///
   /// - Precondition: `end >= start`.
   int_range(int start, int end) : _start(start), _end(end) {
     ADOBE_PRECONDITION(end >= start, "invalid range bounds.");
@@ -200,6 +202,7 @@ public:
   int end() const { return _end; }
 
   /// Increases the upper bound by 1.
+  ///
   /// - Precondition: `end() < INT_MAX`.
   void grow_rightward() {
     ADOBE_PRECONDITION(end() < INT_MAX);
