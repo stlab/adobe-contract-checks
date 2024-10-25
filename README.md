@@ -235,7 +235,8 @@ strings, or be left undefined, in which case it defaults to `verbose`.
   use, but can be useful for measuring the overall performance impact
   of checking in a program.
 
-- `ADOBE_CONTRACT_VIOLATION=custom_verbose`: When a contract violation is detected, a custom handler
+- `ADOBE_CONTRACT_VIOLATION=custom_verbose`: When a contract violation is detected, a custom
+  verbose handler
   is invoked. The client must define the handler in the `adobe` namespace with the signature:
 
   ```cpp
@@ -253,7 +254,7 @@ strings, or be left undefined, in which case it defaults to `verbose`.
   application, and must not return to its caller.
 
 - `ADOBE_CONTRACT_VIOLATION=custom_lightweight`: When a contract violation is detected, a custom
-  handler is invoked. The client must define the handler in the `adobe` namespace with the signature:
+  lightweight handler is invoked. The client must define the handler in the `adobe` namespace with the signature:
 
   ```cpp
   [[noreturn]] void ::adobe::contract_violated_lightweight() {
@@ -263,7 +264,6 @@ strings, or be left undefined, in which case it defaults to `verbose`.
 
   The function should report the violation in a way that is appropriate for the application, and
   must not return to its caller.
-  function must not return.
 
 In `verbose` and `lightweight` modes, a failed check ultimately calls
 [`std::terminate()`](https://en.cppreference.com/w/cpp/error/terminate)
@@ -436,6 +436,13 @@ target_link_libraries(my-executable PRIVATE adobe-contract-checks)
   ADOBE_PRECONDITION(some_expensive_call());
   #endif
   ```
+
+- Include a document in your project describing standard
+  preconditions that don't need to be specified explicitly, and that hold
+  unless explicitly contradicted by documentation.  They should
+  still be checked, but not having to explicitly document that every
+  `const char*` refers to a null-terminated byte string, for example, can
+  be a big win.
 
 ## Rationales
 
