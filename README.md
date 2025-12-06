@@ -108,8 +108,15 @@ document exceptions by setting a project-wide policy that, unless a
 function is `noexcept`, it can throw anything. You can eliminate the
 need to document returned errors by encoding the ability to return an
 error in the function's signature. Documenting _which_ exceptions can be
-thrown or errors reported is not crucial, but documenting the fact
-_that_ an error can occur is.
+thrown or errors reported is not crucial[^exceptionspec], but 
+documenting the fact _that_ an error can occur is.
+
+[^exceptionspec]:  In fact, documenting the specifics of errors 
+reported is usually counterproductive, because the list can
+change due to shifts in what should be implementation details
+because it's seldom useful to the immediate caller, and because
+maintaining these lists through long call change is burdensome
+to the point of being impractical.
 
 Unless otherwise specified in the function's documentation, a reported
 error means all objects the function would otherwise modify are
